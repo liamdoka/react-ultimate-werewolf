@@ -1,7 +1,7 @@
 import { Done } from "@mui/icons-material";
 import { RoomRequest, ServerAction, StatusCallback } from "../../lib/types";
 import { generateRoomCode } from "../../lib/utils";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
 
 export default function Login(props: {
@@ -10,21 +10,46 @@ export default function Login(props: {
   setNickname: Function;
   setRoomCode: Function;
 }) {
-  props.socket.on(ServerAction.JoinRoomCallback, (res: StatusCallback) => {
-    if (res.status == "success") {
-      props.setLoggedIn(true);
-    }
-  });
-
   const nicknameRef = useRef<HTMLInputElement>(null);
   const roomCodeRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    props.socket.on(ServerAction.JoinRoomCallback, handleJoinRoomCallback);
+
+    return () => {
+      props.socket.off(ServerAction.JoinRoomCallback);
+    };
+  }, [props.socket]);
+
+  const handleJoinRoomCallback = (res: StatusCallback & RoomRequest) => {
+    if (res.status == "success") {
+      props.setNickname(res.nickname);
+      props.setRoomCode(res.roomCode);
+      props.setLoggedIn(true);
+    }
+  };
+
   const handleJoinButton = () => {
-    // do somethign
+    const nickname = nicknameRef.current?.value;
+    const roomCode = roomCodeRef.current?.value;
+
+    if (!nickname || nickname.trim() == "") {
+      throw Error("nickname empty");
+    }
+
+    if (!roomCode || roomCode.trim() == "") {
+      throw Error("roomCode empty");
+    }
+
+    const roomRequest: RoomRequest = {
+      nickname: nickname,
+      roomCode: roomCode,
+    };
+
+    props.socket.emit(ServerAction.JoinRoom, roomRequest);
   };
 
   const handleCreateButton = () => {
-    // do somethign esle;
     const nickname = nicknameRef.current?.value;
 
     if (!nickname || nickname.trim() == "") {
@@ -37,9 +62,6 @@ export default function Login(props: {
       nickname: nickname,
       roomCode: newRoomCode,
     };
-
-    props.setNickname(nickname);
-    props.setRoomCode(newRoomCode);
 
     props.socket.emit(ServerAction.CreateRoom, roomRequest);
     props.socket.emit(ServerAction.JoinRoom, roomRequest);

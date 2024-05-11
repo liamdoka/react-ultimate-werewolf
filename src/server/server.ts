@@ -24,8 +24,6 @@ const io = new Server(server, {
 export const activeRooms: Record<string, RoomObject> = {};
 
 io.on("connection", (socket) => {
-  socket.emit("Connected", "welcome bruh");
-
   socket.on(ServerAction.CreateRoom, (payload: RoomRequest) =>
     handleCreateRoom(socket, payload),
   );

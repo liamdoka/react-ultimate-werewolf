@@ -23,19 +23,20 @@ export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
   }
 
   activeRooms[payload.roomCode].players.push(payload.nickname);
+  socket.join(payload.roomCode);
 
-  const response: StatusCallback = {
+  const response: StatusCallback & RoomRequest = {
     status: "success",
+    nickname: payload.nickname,
+    roomCode: payload.roomCode,
   };
 
   socket.emit(ServerAction.JoinRoomCallback, response);
 };
 
-export const handleCreateRoom = (socket: Socket, payload: RoomRequest) => {
-  console.log(activeRooms[payload.roomCode]);
-
+export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
   if (activeRooms[payload.roomCode]) {
-    return;
+    throw Error("Room already exists");
   }
 
   const newRoom: RoomObject = {
@@ -44,7 +45,6 @@ export const handleCreateRoom = (socket: Socket, payload: RoomRequest) => {
   };
 
   activeRooms[payload.roomCode] = newRoom;
-  socket.join(payload.roomCode);
 
   console.log(activeRooms);
 };
@@ -52,10 +52,6 @@ export const handleCreateRoom = (socket: Socket, payload: RoomRequest) => {
 export const handleChatMessage = (socket: Socket, payload: ChatMessage) => {
   console.log(`server receieved message: ${payload.message}`);
 
-  // socket.to(payload.room).emit(ServerAction.ChatMessage, payload);
-
+  socket.to(payload.room).emit(ServerAction.ChatMessage, payload);
   socket.emit(ServerAction.ChatMessage, payload);
-  console.log(socket.rooms);
-
-  console.log(activeRooms);
 };

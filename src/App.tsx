@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Chatbox from "./components/chatbox/chatbox";
 import Login from "./components/login/login";
 
@@ -8,9 +8,6 @@ import { Flip, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const socket = io("ws://localhost:3000");
-socket.on("Connected", (msg) => {
-  console.log(msg);
-});
 
 function App() {
   const [nickname, setNickname] = useState("");
