@@ -21,10 +21,6 @@ export default function Chatbox(props: {
     };
   }, [props.socket]);
 
-  useEffect(() => {
-    console.log(chatMessages);
-  }, [chatMessages]);
-
   const handleKeyDown = (e: any) => {
     if (e?.key === "Enter") {
       handleSend();
@@ -53,7 +49,6 @@ export default function Chatbox(props: {
     };
 
     props.socket.emit(ServerAction.ChatMessage, messageObject);
-    console.log(`message sent in room ${props.roomCode}`);
   };
 
   return (
@@ -62,15 +57,24 @@ export default function Chatbox(props: {
       <div className="flex w-full flex-grow flex-col justify-between overflow-hidden rounded-md bg-slate-800">
         <div className=" flex flex-grow flex-col gap-2 overflow-y-auto p-4">
           {chatMessages.length == 0 ? (
-            <p className="pt-8 text-center text-slate-500">Message Area</p>
+            <p className="text-center text-slate-500">Message Area</p>
           ) : (
-            chatMessages.map((message: ChatMessage) => (
-              <ChatboxMessage
-                key={message.iat}
-                {...message}
-                self={message.sender == props.nickname}
-              />
-            ))
+            chatMessages.map((message: ChatMessage) =>
+              message.sender == "" ? (
+                <p
+                  className="text-center text-sm text-slate-500"
+                  key={message.iat}
+                >
+                  {message.message}
+                </p>
+              ) : (
+                <ChatboxMessage
+                  key={message.iat}
+                  self={message.sender == props.nickname}
+                  {...message}
+                />
+              ),
+            )
           )}
         </div>
         <div className="flex flex-row flex-nowrap justify-between border-t-2 border-slate-700 text-slate-50">

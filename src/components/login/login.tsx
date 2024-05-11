@@ -1,7 +1,7 @@
 import { Done } from "@mui/icons-material";
 import { RoomRequest, ServerAction, StatusCallback } from "../../lib/types";
 import { generateRoomCode } from "../../lib/utils";
-import { useEffect, useRef } from "react";
+import { KeyboardEventHandler, useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
 
 export default function Login(props: {
@@ -26,6 +26,22 @@ export default function Login(props: {
       props.setNickname(res.nickname);
       props.setRoomCode(res.roomCode);
       props.setLoggedIn(true);
+    }
+  };
+
+  const handleKeyDown = (ev: React.KeyboardEvent) => {
+    if (ev.key == "Enter") {
+      ev.preventDefault();
+      const nickname = nicknameRef.current?.value;
+      const roomCode = roomCodeRef.current?.value;
+
+      if (nickname?.trim() != "") {
+        if (roomCode?.trim() != "") {
+          handleJoinButton();
+        } else {
+          handleCreateButton();
+        }
+      }
     }
   };
 
@@ -77,6 +93,7 @@ export default function Login(props: {
           ref={nicknameRef}
           type="text"
           placeholder="nickname"
+          onKeyDown={handleKeyDown}
         />
 
         <div className="flex flex-row flex-nowrap">
@@ -86,6 +103,7 @@ export default function Login(props: {
             ref={roomCodeRef}
             type="text"
             placeholder="join room"
+            onKeyDown={handleKeyDown}
           />
           {/* join room */}
           <button

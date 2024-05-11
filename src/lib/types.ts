@@ -1,18 +1,10 @@
-export enum MessageType {
-  Auth,
-  Chat,
-  Other,
-}
-
 export enum ServerAction {
   CreateRoom = "CreateRoom",
   JoinRoom = "JoinRoom",
   JoinRoomCallback = "JoinRoomCallback",
-  LeaveRoom = "LeaveRoom",
   ChatMessage = "ChatMessage",
+  UpdateLobby = "UpdateLobby",
 }
-
-export enum ClientAction {}
 
 export enum GameState {
   Waiting,
@@ -29,7 +21,7 @@ export interface RoomRequest {
   nickname: string;
 }
 
-export interface RoomObject {
+export interface Lobby {
   players: string[];
   state: GameState;
 }
@@ -39,11 +31,4 @@ export interface ChatMessage {
   room: string;
   sender: string;
   iat: number;
-}
-
-export interface WebSocketData {
-  nickname: string;
-  createdAt: number;
-  room: string;
-  role: string | null;
 }

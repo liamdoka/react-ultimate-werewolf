@@ -2,12 +2,13 @@ import { Socket } from "socket.io";
 import {
   ChatMessage,
   GameState,
-  RoomObject,
+  Lobby,
   RoomRequest,
   ServerAction,
   StatusCallback,
 } from "../../lib/types";
 import { activeRooms } from "../server";
+import { handleUserJoined } from "./lobbyHandlers";
 
 export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
   if (!payload.roomCode && !payload.nickname) {
@@ -32,6 +33,7 @@ export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
   };
 
   socket.emit(ServerAction.JoinRoomCallback, response);
+  handleUserJoined(socket, { ...payload, ...activeRooms[payload.roomCode] });
 };
 
 export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
@@ -39,14 +41,12 @@ export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
     throw Error("Room already exists");
   }
 
-  const newRoom: RoomObject = {
+  const newRoom: Lobby = {
     players: [],
     state: GameState.Waiting,
   };
 
   activeRooms[payload.roomCode] = newRoom;
-
-  console.log(activeRooms);
 };
 
 export const handleChatMessage = (socket: Socket, payload: ChatMessage) => {
