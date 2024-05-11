@@ -1,14 +1,29 @@
 "use client";
 import { Send } from "@mui/icons-material";
-import { Message } from "../../../server/lib/types";
+import { ChatMessage, ServerAction } from "../../lib/types";
+import { Socket } from "socket.io-client";
+import { useEffect, useState } from "react";
 
-const socket = new WebSocket("ws://localhost:3000/chat");
+const handleChatMessage = (payload: ChatMessage) => {
+  console.log(`client received message: ${payload.message}`);
+  allMessages.push(payload.message);
+};
+
 let allMessages: string[] = [];
-socket.addEventListener("message", (event) => {
-  console.log(event);
-});
 
-export default function Chatbox() {
+export default function Chatbox(props: {
+  socket: Socket;
+  nickname: string;
+  roomCode: string;
+}) {
+  useEffect(() => {
+    props.socket.on(ServerAction.ChatMessage, handleChatMessage);
+  });
+
+  useEffect(() => {
+    console.log(allMessages);
+  }, [allMessages]);
+
   const handleKeyDown = (e: any) => {
     if (e?.key === "Enter") {
       handleSend();
@@ -16,21 +31,24 @@ export default function Chatbox() {
   };
 
   const handleSend = () => {
-    const message = (
-      document.getElementById("chatboxInput") as HTMLInputElement
-    )?.value;
+    const input = document.getElementById("chatboxInput") as HTMLInputElement;
+    const message = input?.value;
     if (message) {
       sendMessage(message);
+      input.value = "";
     }
   };
 
   const sendMessage = (message: string) => {
-    const messageObject: Message = {
-      type: "CHAT",
-      payload: message,
+    const messageObject: ChatMessage = {
+      message: message,
+      sender: props.nickname,
+      room: props.roomCode,
+      iat: Date.now(),
     };
 
-    socket.send(JSON.stringify(messageObject));
+    props.socket.emit(ServerAction.ChatMessage, messageObject);
+    console.log(`message sent in room ${props.roomCode}`);
   };
 
   return (
