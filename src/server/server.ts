@@ -32,9 +32,7 @@ io.on("connection", (socket) => {
   socket.on(ServerAction.ChatMessage, (payload: ChatMessage) =>
     handleChatMessage(socket, payload),
   );
-  socket.on(ServerAction.UpdateLobby, (payload: Lobby) =>
-    handleUpdateLobby(socket, payload),
-  );
+  socket.on(ServerAction.UpdateLobby, () => handleUpdateLobby(socket));
 
   socket.on("disconnecting", (payload: DisconnectReason) => {
     handleDisconnect(socket, payload);

@@ -1,11 +1,14 @@
 import { Socket } from "socket.io";
 import { ChatMessage, Lobby, RoomRequest, ServerAction } from "../../lib/types";
 import { getRoomCode } from "../../lib/utils";
+import { activeRooms } from "../server";
 
-export const handleUpdateLobby = (socket: Socket, payload: Lobby) => {
+export const handleUpdateLobby = (socket: Socket) => {
   const roomCode = getRoomCode(socket);
+  const lobby = activeRooms[roomCode];
 
-  socket.to(roomCode).emit(ServerAction.UpdateLobby, payload);
+  socket.to(roomCode).emit(ServerAction.UpdateLobby, lobby);
+  socket.emit(ServerAction.UpdateLobby, lobby);
 };
 
 export const handleUserJoined = (
@@ -22,6 +25,7 @@ export const handleUserJoined = (
   };
 
   socket.to(roomCode).emit(ServerAction.ChatMessage, serverChatMessage);
+  handleUpdateLobby(socket);
 };
 
 export const handleUserDisconnected = (
@@ -38,5 +42,5 @@ export const handleUserDisconnected = (
   };
 
   socket.to(roomCode).emit(ServerAction.ChatMessage, serverChatMessage);
-  socket.to(roomCode).emit(ServerAction.UpdateLobby, payload);
+  handleUpdateLobby(socket);
 };

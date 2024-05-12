@@ -16,7 +16,7 @@ export default function RoomCode(props: { code: string }) {
 
   return (
     <div className="flex flex-col flex-nowrap items-center justify-center gap-2 rounded-md bg-slate-700 p-2 shadow-xl">
-      <div className="select-none font-bold">Room Code</div>
+      <p className="select-none font-bold">Room Code</p>
       <div className="flex flex-row items-center justify-center gap-2">
         <div className="flex items-center justify-center rounded-md p-1 hover:bg-slate-500">
           <div

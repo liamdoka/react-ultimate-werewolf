@@ -7,7 +7,7 @@ export default function ChatboxMessage(
   const alignment = props.self ? "text-right" : "text-left";
 
   return (
-    <div className={`flex flex-col ${alignment}`}>
+    <div className={`flex flex-col ${alignment} max-w-full`}>
       <p className="text-sm leading-3 text-slate-400">
         {props.self ? (
           <span>
@@ -19,7 +19,9 @@ export default function ChatboxMessage(
           </span>
         )}
       </p>
-      <p>{props.message}</p>
+      <p className="max-w-full text-wrap" style={{ overflowWrap: "anywhere" }}>
+        {props.message}
+      </p>
     </div>
   );
 }
