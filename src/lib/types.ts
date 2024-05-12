@@ -12,6 +12,26 @@ export enum GameState {
   Ended,
 }
 
+export enum CardType {
+  BluSpy,
+  Demoman,
+  Engineer,
+  Heavy,
+  Medic,
+  Pyro,
+  Scout,
+  Sniper,
+  Soldier,
+  Spy,
+}
+
+export interface CardDetails {
+  name: string;
+  img: string;
+  details: string;
+  utility: string;
+}
+
 export interface StatusCallback {
   status: "failure" | "success";
 }
@@ -23,6 +43,7 @@ export interface RoomRequest {
 
 export interface Lobby {
   players: string[];
+  deck: CardType[];
   state: GameState;
 }
 

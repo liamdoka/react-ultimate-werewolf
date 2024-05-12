@@ -43,6 +43,7 @@ export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
 
   const newRoom: Lobby = {
     players: [],
+    deck: [],
     state: GameState.Waiting,
   };
 

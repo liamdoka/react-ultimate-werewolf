@@ -1,4 +1,4 @@
-import { DisconnectReason, Server, Socket } from "socket.io";
+import { DisconnectReason, Server } from "socket.io";
 import { createServer } from "node:http";
 import express from "express";
 import { ChatMessage, Lobby, RoomRequest, ServerAction } from "../lib/types";
@@ -34,45 +34,44 @@ io.on("connection", (socket) => {
   );
   socket.on(ServerAction.UpdateLobby, () => handleUpdateLobby(socket));
 
-  socket.on("disconnecting", (payload: DisconnectReason) => {
-    handleDisconnect(socket, payload);
-  });
-});
+  // Handle Disconnect with IO and Socket
+  socket.on("disconnecting", (_payload: DisconnectReason) => {
+    if (socket.rooms.size > 1) {
+      // convert maps to arrays
+      const currentRoom = [...socket.rooms][1];
+      const activeRoom = activeRooms[currentRoom];
+      const socketsInRoom = [
+        ...(io.sockets.adapter.rooms!.get(currentRoom) ?? ""),
+      ];
 
-const handleDisconnect = (socket: Socket, _payload: DisconnectReason) => {
-  if (socket.rooms.size > 1) {
-    // convert maps to arrays
-    const currentRoom = [...socket.rooms][1];
-    const activeRoom = activeRooms[currentRoom];
-    const socketsInRoom = [...io.sockets.adapter.rooms.get(currentRoom)];
+      let nickname;
 
-    let nickname;
+      // check if socketID matches one in current room
+      for (let i = 0; i < activeRoom.players.length; i++) {
+        if (socketsInRoom[i] == socket.id) {
+          nickname = activeRoom.players.splice(i, 1)[0];
 
-    // check if socketID matches one in current room
-    for (let i = 0; i < activeRoom.players.length; i++) {
-      if (socketsInRoom[i] == socket.id) {
-        nickname = activeRoom.players.splice(i, 1)[0];
-
-        if (activeRoom.players.length == 0) {
-          delete activeRooms[currentRoom];
+          if (activeRoom.players.length == 0) {
+            delete activeRooms[currentRoom];
+          }
+          break;
         }
-        break;
+      }
+
+      //update all lobbies
+      if (activeRooms[currentRoom]) {
+        socket
+          .to(currentRoom)
+          .emit(ServerAction.UpdateLobby, activeRooms[currentRoom]);
+        handleUserDisconnected(socket, {
+          roomCode: "",
+          nickname: nickname ?? "",
+          ...activeRooms[currentRoom],
+        });
       }
     }
-
-    //update all lobbies
-    if (activeRooms[currentRoom]) {
-      socket
-        .to(currentRoom)
-        .emit(ServerAction.UpdateLobby, activeRooms[currentRoom]);
-      handleUserDisconnected(socket, {
-        roomCode: "",
-        nickname: nickname ?? "",
-        ...activeRooms[currentRoom],
-      });
-    }
-  }
-};
+  });
+});
 
 server.listen(3000, () => {
   console.log("listening on *:3000");
