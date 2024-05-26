@@ -3,6 +3,7 @@ export enum ServerAction {
   JoinRoom = "JoinRoom",
   JoinRoomCallback = "JoinRoomCallback",
   ChatMessage = "ChatMessage",
+  SyncLobby = "SyncLobby",
   UpdateLobby = "UpdateLobby",
 }
 
@@ -13,6 +14,7 @@ export enum GameState {
 }
 
 export enum CardType {
+  Empty,
   BluSpy,
   Demoman,
   Engineer,
@@ -42,9 +44,16 @@ export interface RoomRequest {
 }
 
 export interface Lobby {
-  players: string[];
+  players: Player[];
   deck: CardType[];
   state: GameState;
+  discussionTime: number;
+}
+
+export interface Player {
+  socketId: string;
+  nickname: string;
+  card: CardType;
 }
 
 export interface ChatMessage {

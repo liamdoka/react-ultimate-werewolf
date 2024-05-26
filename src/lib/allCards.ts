@@ -62,3 +62,21 @@ export const allCards: Record<CardType, CardDetails> = {
     utility: "",
   },
 };
+
+export const defaultDeck: CardType[] = [
+  CardType.BluSpy,
+  CardType.BluSpy,
+  CardType.BluSpy,
+  CardType.Soldier,
+  CardType.Soldier,
+  CardType.Soldier,
+  CardType.Scout,
+  CardType.Pyro,
+  CardType.Engineer,
+  CardType.Demoman,
+  CardType.Medic,
+  CardType.Medic,
+  CardType.Sniper,
+  CardType.Heavy,
+  CardType.Spy,
+];

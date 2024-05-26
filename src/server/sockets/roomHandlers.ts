@@ -1,8 +1,10 @@
 import { Socket } from "socket.io";
 import {
+  CardType,
   ChatMessage,
   GameState,
   Lobby,
+  Player,
   RoomRequest,
   ServerAction,
   StatusCallback,
@@ -19,11 +21,22 @@ export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
     throw Error("Room code does not exist");
   }
 
-  if (activeRooms[payload.roomCode].players.includes(payload.nickname)) {
+  const playerExists =
+    activeRooms[payload.roomCode].players.find(
+      (player: Player) => player.nickname == payload.nickname,
+    ) != null;
+
+  if (playerExists) {
     throw Error("Nickname already in use");
   }
 
-  activeRooms[payload.roomCode].players.push(payload.nickname);
+  const newPlayer: Player = {
+    socketId: socket.id,
+    nickname: payload.nickname,
+    card: CardType.Empty,
+  };
+
+  activeRooms[payload.roomCode].players.push(newPlayer);
   socket.join(payload.roomCode);
 
   const response: StatusCallback & RoomRequest = {
@@ -45,6 +58,7 @@ export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
     players: [],
     deck: [],
     state: GameState.Waiting,
+    discussionTime: 0,
   };
 
   activeRooms[payload.roomCode] = newRoom;

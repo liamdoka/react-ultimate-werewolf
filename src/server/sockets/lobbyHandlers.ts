@@ -3,18 +3,18 @@ import { ChatMessage, Lobby, RoomRequest, ServerAction } from "../../lib/types";
 import { getRoomCode } from "../../lib/utils";
 import { activeRooms } from "../server";
 
-export const handleUpdateLobby = (socket: Socket) => {
+// source of truth is the server
+export const handleSyncLobby = (socket: Socket) => {
   const roomCode = getRoomCode(socket);
   const lobby = activeRooms[roomCode];
 
-  socket.to(roomCode).emit(ServerAction.UpdateLobby, lobby);
-  socket.emit(ServerAction.UpdateLobby, lobby);
+  socket.to(roomCode).emit(ServerAction.SyncLobby, lobby);
+  socket.emit(ServerAction.SyncLobby, lobby);
+
+  console.log("Syncing Lobby");
 };
 
-export const handleUserJoined = (
-  socket: Socket,
-  payload: Lobby & RoomRequest,
-) => {
+export const handleUserJoined = (socket: Socket, payload: RoomRequest) => {
   const roomCode = getRoomCode(socket);
 
   const serverChatMessage: ChatMessage = {
@@ -25,14 +25,14 @@ export const handleUserJoined = (
   };
 
   socket.to(roomCode).emit(ServerAction.ChatMessage, serverChatMessage);
-  handleUpdateLobby(socket);
+  handleSyncLobby(socket);
 };
 
 export const handleUserDisconnected = (
   socket: Socket,
-  payload: Lobby & RoomRequest,
+  payload: RoomRequest,
 ) => {
-  const roomCode = getRoomCode(socket);
+  const roomCode = payload.roomCode ?? getRoomCode(socket);
 
   const serverChatMessage: ChatMessage = {
     sender: "",
@@ -42,5 +42,14 @@ export const handleUserDisconnected = (
   };
 
   socket.to(roomCode).emit(ServerAction.ChatMessage, serverChatMessage);
-  handleUpdateLobby(socket);
+  handleSyncLobby(socket);
+};
+
+// source of truth is the admin
+export const handleUpdateLobby = (socket: Socket, payload: Lobby) => {
+  const roomCode = getRoomCode(socket);
+
+  activeRooms[roomCode] = payload;
+  socket.to(roomCode).emit(ServerAction.SyncLobby, payload);
+  socket.emit(ServerAction.SyncLobby, payload);
 };
