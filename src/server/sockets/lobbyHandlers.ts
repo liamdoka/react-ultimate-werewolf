@@ -10,8 +10,6 @@ export const handleSyncLobby = (socket: Socket) => {
 
   socket.to(roomCode).emit(ServerAction.SyncLobby, lobby);
   socket.emit(ServerAction.SyncLobby, lobby);
-
-  console.log("Syncing Lobby");
 };
 
 export const handleUserJoined = (socket: Socket, payload: RoomRequest) => {

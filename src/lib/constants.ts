@@ -1,0 +1,3 @@
+export const DISCUSSION_TIME_STEP_SIZE = 15;
+export const MIN_DISCUSSION_TIME = 15;
+export const MAX_DISCUSSION_TIME = 300;

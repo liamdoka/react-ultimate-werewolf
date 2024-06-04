@@ -4,23 +4,17 @@ import RoomCode from "../components/roomcode/roomcode";
 import LobbyMenu from "../components/lobby/lobby";
 import GameSetup from "../components/game/gameSetup";
 import { useEffect, useState } from "react";
-import { GameState, Lobby, ServerAction } from "../lib/types";
+import { Lobby, ServerAction } from "../lib/types";
 
 export default function GamePage(props: {
   socket: Socket;
   roomCode: string;
   nickname: string;
 }) {
-  const [lobby, setLobby] = useState<Lobby>({
-    players: [],
-    deck: [],
-    discussionTime: 300,
-    state: GameState.Waiting,
-  });
+  const [lobby, setLobby] = useState<Lobby>();
 
   useEffect(() => {
     props.socket.on(ServerAction.SyncLobby, (payload: Lobby) => {
-      console.log("Syncing Lobby");
       setLobby(payload);
     });
 
@@ -34,16 +28,21 @@ export default function GamePage(props: {
 
   return (
     <div className="flex flex-row gap-4">
-      <div className="flex flex-col items-center gap-4">
-        <RoomCode code={props.roomCode} />
-        <LobbyMenu socket={props.socket} lobby={lobby} />
-      </div>
-      <GameSetup socket={props.socket} lobby={lobby} />
-      <Chatbox
-        socket={props.socket}
-        nickname={props.nickname}
-        roomCode={props.roomCode}
-      />
+      {lobby && (
+        <>
+          <div className="flex flex-col items-center gap-4">
+            <RoomCode code={props.roomCode} />
+            <LobbyMenu socket={props.socket} lobby={lobby} />
+          </div>
+
+          <GameSetup socket={props.socket} lobby={lobby} />
+          <Chatbox
+            socket={props.socket}
+            nickname={props.nickname}
+            roomCode={props.roomCode}
+          />
+        </>
+      )}
     </div>
   );
 }
