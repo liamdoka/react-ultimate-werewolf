@@ -2,17 +2,19 @@ import { allCards } from "../../lib/allCards";
 import { CardDetails, CardType } from "../../lib/types";
 
 export default function GameCard(props: {
-  toggleEnabled: Function;
   cardType: CardType;
   enabled?: boolean;
+  toggleEnabled: Function;
+  selectable?: boolean;
 }) {
   const cardDetails: CardDetails = allCards[props.cardType];
-  const isDisabled = props.enabled ? "" : "opacity-30";
+  const isDisabled = !props.enabled ? "opacity-30" : "";
+  const isSelectable = props.selectable ? "cursor-pointer" : "";
 
   return (
     <div
       onMouseDown={() => props.toggleEnabled()}
-      className={`flex flex-col gap-1 rounded-md bg-slate-700 p-1 shadow-md ${isDisabled} cursor-pointer`}
+      className={`flex select-none flex-col gap-1 rounded-md bg-slate-700 p-1 shadow-md ${isDisabled} ${isSelectable}`}
     >
       <div className="w-24 overflow-clip rounded-sm">
         <img
