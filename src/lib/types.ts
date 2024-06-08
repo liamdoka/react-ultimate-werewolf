@@ -46,6 +46,7 @@ export interface RoomRequest {
 export interface Lobby {
   players: Player[];
   deck: CardType[];
+  admin: string;
   state: GameState;
   discussionTime: number;
 }
@@ -53,6 +54,7 @@ export interface Lobby {
 export interface Player {
   socketId: string;
   nickname: string;
+  isReady: boolean;
   card: CardType;
 }
 

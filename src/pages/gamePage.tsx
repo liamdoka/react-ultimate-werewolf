@@ -4,14 +4,17 @@ import RoomCode from "../components/roomcode/roomcode";
 import LobbyMenu from "../components/lobby/lobby";
 import GameSetup from "../components/game/gameSetup";
 import { useEffect, useState } from "react";
-import { Lobby, ServerAction } from "../lib/types";
+import { Lobby, Player, ServerAction } from "../lib/types";
 
-export default function GamePage(props: {
-  socket: Socket;
-  roomCode: string;
-  nickname: string;
-}) {
+export default function GamePage(props: { socket: Socket; roomCode: string }) {
   const [lobby, setLobby] = useState<Lobby>();
+  const [self, setSelf] = useState<Player>();
+
+  useEffect(() => {
+    setSelf(
+      lobby?.players.find((player) => player.socketId === props.socket.id),
+    );
+  }, [lobby]);
 
   useEffect(() => {
     props.socket.on(ServerAction.SyncLobby, (payload: Lobby) => {
@@ -38,7 +41,7 @@ export default function GamePage(props: {
           <GameSetup socket={props.socket} lobby={lobby} />
           <Chatbox
             socket={props.socket}
-            nickname={props.nickname}
+            nickname={self?.nickname ?? "_"}
             roomCode={props.roomCode}
           />
         </>

@@ -1,13 +1,12 @@
 import { Done } from "@mui/icons-material";
 import { RoomRequest, ServerAction, StatusCallback } from "../../lib/types";
 import { generateRoomCode } from "../../lib/utils";
-import { KeyboardEventHandler, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
 
 export default function Login(props: {
   socket: Socket;
   setLoggedIn: Function;
-  setNickname: Function;
   setRoomCode: Function;
 }) {
   const nicknameRef = useRef<HTMLInputElement>(null);
@@ -23,7 +22,6 @@ export default function Login(props: {
 
   const handleJoinRoomCallback = (res: StatusCallback & RoomRequest) => {
     if (res.status == "success") {
-      props.setNickname(res.nickname);
       props.setRoomCode(res.roomCode);
       props.setLoggedIn(true);
     }

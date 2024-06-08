@@ -9,7 +9,6 @@ import GamePage from "./pages/gamePage";
 const socket = io("ws://localhost:3000");
 
 function App() {
-  const [nickname, setNickname] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [isLoggedIn, setLoggedIn] = useState(false);
 
@@ -17,17 +16,16 @@ function App() {
     <div className="m-0 flex min-h-full min-w-full flex-col items-center justify-center bg-slate-800 p-0 text-slate-50">
       <main className="m-auto flex h-screen w-full max-w-screen-lg flex-col items-center justify-evenly">
         {isLoggedIn ? (
-          <GamePage nickname={nickname} roomCode={roomCode} socket={socket} />
+          <GamePage roomCode={roomCode} socket={socket} />
         ) : (
           <LoginPage
             socket={socket}
             setLoggedIn={setLoggedIn}
-            setNickname={setNickname}
             setRoomCode={setRoomCode}
           />
         )}
         <ToastContainer
-          position="bottom-right"
+          position="bottom-left"
           autoClose={5000}
           hideProgressBar={false}
           newestOnTop

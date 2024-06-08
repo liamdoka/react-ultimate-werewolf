@@ -1,4 +1,4 @@
-import { Lobby, ServerAction } from "../../lib/types";
+import { Lobby, Player, ServerAction } from "../../lib/types";
 import GameCard from "./gameCard";
 import { Socket } from "socket.io-client";
 import { defaultDeck } from "../../lib/allCards";
@@ -9,13 +9,15 @@ import {
   MAX_DISCUSSION_TIME,
   MIN_DISCUSSION_TIME,
 } from "../../lib/constants";
+import CannotRemoveCardToast from "../toasts/cannotRemoveCardToast";
+import { toast } from "react-toastify";
 
 export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
   const numCards = props.lobby.deck.length;
   const totalCards = props.lobby.players.length + 3;
 
-  const isReady = numCards >= totalCards;
-  const isAdmin = props.socket.id === props.lobby.players[0].socketId;
+  const isLobbyReady = numCards >= totalCards;
+  const isAdmin = props.socket.id === props.lobby.admin;
 
   const discussionTimeRef = useRef<HTMLInputElement>(null);
 
@@ -27,6 +29,15 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
 
   const toggleCardEnabled = (cardId: number) => {
     if (!isAdmin) return;
+
+    if (cardId === 0) {
+      toast(<CannotRemoveCardToast />, {
+        hideProgressBar: true,
+        autoClose: 2000,
+      });
+
+      return;
+    }
 
     let newDeck;
     if (props.lobby.deck.includes(cardId) == false) {
@@ -41,6 +52,18 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
       ...props.lobby,
       deck: newDeck,
     };
+
+    props.socket.emit(ServerAction.UpdateLobby, newLobby);
+  };
+
+  const toggleReady = () => {
+    const newLobby = { ...props.lobby };
+    const playerIndex = newLobby.players.findIndex(
+      (player: Player) => player.socketId === props.socket.id,
+    );
+
+    newLobby.players[playerIndex].isReady =
+      !newLobby.players[playerIndex].isReady;
 
     props.socket.emit(ServerAction.UpdateLobby, newLobby);
   };
@@ -76,6 +99,7 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
             cardType={card}
             enabled={props.lobby.deck.includes(i)}
             toggleEnabled={() => toggleCardEnabled(i)}
+            selectable={i !== 0 ? isAdmin : false}
             key={`${card}_${i}`}
           />
         ))}
@@ -115,8 +139,11 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
           </div>
           <div>secs</div>
         </div>
-        {isReady ? (
-          <div className="basis-full rounded-md bg-slate-800 p-2 text-center font-bold">
+        {isLobbyReady ? (
+          <div
+            className={`basis-full rounded-md bg-slate-800 p-2 text-center font-bold`}
+            onClick={toggleReady}
+          >
             Ready
           </div>
         ) : (

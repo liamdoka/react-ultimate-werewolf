@@ -4,7 +4,6 @@ import Login from "../components/login/login";
 export default function LoginPage(props: {
   socket: Socket;
   setLoggedIn: Function;
-  setNickname: Function;
   setRoomCode: Function;
 }) {
   // TODO: Refactor this to use context and reducer!
@@ -17,7 +16,6 @@ export default function LoginPage(props: {
       <Login
         socket={props.socket}
         setLoggedIn={props.setLoggedIn}
-        setNickname={props.setNickname}
         setRoomCode={props.setRoomCode}
       />
     </div>

@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { Lobby } from "../../lib/types";
+import { Lobby, Player } from "../../lib/types";
 import LobbyMember from "./lobbyMember";
 
 export default function LobbyMenu(props: { socket: Socket; lobby: Lobby }) {
@@ -13,11 +13,12 @@ export default function LobbyMenu(props: { socket: Socket; lobby: Lobby }) {
         <div className="text-slate-400">{playerNumString}</div>
       </div>
       <div className="flex flex-row flex-wrap items-center justify-center gap-2">
-        {props.lobby.players.map((player, i) => (
+        {props.lobby.players.map((player: Player) => (
           <LobbyMember
             nickname={player.nickname}
             key={player.nickname}
-            isAdmin={i === 0}
+            isAdmin={player.socketId === props.lobby.admin}
+            isReady={player.isReady}
           />
         ))}
       </div>

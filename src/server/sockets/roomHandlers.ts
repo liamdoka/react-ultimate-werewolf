@@ -2,7 +2,6 @@ import { Socket } from "socket.io";
 import {
   CardType,
   ChatMessage,
-  GameState,
   Lobby,
   Player,
   RoomRequest,
@@ -11,18 +10,21 @@ import {
 } from "../../lib/types";
 import { activeRooms } from "../server";
 import { handleUserJoined } from "./lobbyHandlers";
+import { defaultRoom } from "../../lib/constants";
 
 export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
   if (!payload.roomCode && !payload.nickname) {
     throw Error("Invalid arguments");
   }
 
-  if (!activeRooms[payload.roomCode]) {
-    throw Error("Room code does not exist");
+  const lobby: Lobby | undefined = activeRooms.get(payload.roomCode);
+
+  if (!lobby) {
+    throw Error(`room with code ${payload.roomCode} does not exist`);
   }
 
   const playerExists =
-    activeRooms[payload.roomCode].players.find(
+    lobby.players.find(
       (player: Player) => player.nickname == payload.nickname,
     ) != null;
 
@@ -34,9 +36,15 @@ export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
     socketId: socket.id,
     nickname: payload.nickname,
     card: CardType.Empty,
+    isReady: false,
   };
 
-  activeRooms[payload.roomCode].players.push(newPlayer);
+  if (!lobby.admin) {
+    lobby.admin = socket.id;
+  }
+
+  lobby.players.push(newPlayer);
+
   socket.join(payload.roomCode);
 
   const response: StatusCallback & RoomRequest = {
@@ -46,22 +54,16 @@ export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
   };
 
   socket.emit(ServerAction.JoinRoomCallback, response);
-  handleUserJoined(socket, { ...payload, ...activeRooms[payload.roomCode] });
+  handleUserJoined(socket, { ...payload, ...lobby });
 };
 
 export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
-  if (activeRooms[payload.roomCode]) {
+  if (activeRooms.has(payload.roomCode)) {
     throw Error("Room already exists");
   }
 
-  const newRoom: Lobby = {
-    players: [],
-    deck: [],
-    state: GameState.Waiting,
-    discussionTime: 0,
-  };
-
-  activeRooms[payload.roomCode] = newRoom;
+  const newRoom: Lobby = { ...defaultRoom };
+  activeRooms.set(payload.roomCode, newRoom);
 };
 
 export const handleChatMessage = (socket: Socket, payload: ChatMessage) => {

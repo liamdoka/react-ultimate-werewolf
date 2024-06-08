@@ -1,6 +1,6 @@
 import { ContentCopy } from "@mui/icons-material";
 
-export default function RoomCodeToast() {
+export default function RoomCodeCopiedToast() {
   return (
     <div className="flex flex-row items-center justify-center gap-2 p-2">
       <div>

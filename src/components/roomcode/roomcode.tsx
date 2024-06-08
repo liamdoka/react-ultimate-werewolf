@@ -1,14 +1,14 @@
 import { Visibility, VisibilityOff, ContentCopy } from "@mui/icons-material";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import RoomCodeToast from "../toasts/roomcodeToast";
+import RoomCodeCopiedToast from "../toasts/roomCodeCopiedToast";
 
 export default function RoomCode(props: { code: string }) {
   const [isVisible, setIsVisible] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(props.code);
-    toast(<RoomCodeToast />, {
+    toast(<RoomCodeCopiedToast />, {
       hideProgressBar: true,
       autoClose: 2000,
     });

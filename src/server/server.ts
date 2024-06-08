@@ -27,7 +27,7 @@ const io = new Server(server, {
   },
 });
 
-export const activeRooms: Record<string, Lobby> = {};
+export const activeRooms: Map<string, Lobby> = new Map();
 
 io.on("connection", (socket) => {
   socket.on(ServerAction.CreateRoom, (payload: RoomRequest) =>
@@ -48,19 +48,23 @@ io.on("connection", (socket) => {
   // Handle Disconnect with IO and Socket
   socket.on("disconnecting", (_payload: DisconnectReason) => {
     if (socket.rooms.size > 1) {
-      // convert maps to arrays
+      // get RoomCode from socket
       const roomCode = [...socket.rooms][1];
+      const lobby = activeRooms.get(roomCode);
+      if (!lobby) return;
 
-      const currentPlayer = activeRooms[roomCode].players.find(
+      const currentPlayer = lobby.players.find(
         (player: Player) => player.socketId == socket.id,
       );
 
-      activeRooms[roomCode].players = activeRooms[roomCode].players.filter(
+      lobby.players = lobby.players.filter(
         (player: Player) => player.socketId !== socket.id,
       );
 
       //update all lobbies
-      if (activeRooms[roomCode]) {
+      if (lobby.players.length > 0) {
+        lobby.admin == lobby.players[0].socketId;
+
         handleUserDisconnected(socket, {
           roomCode: roomCode,
           nickname: currentPlayer?.nickname ?? "",
