@@ -61,6 +61,12 @@ export const allCards: Record<CardType, CardDetails> = {
     details: "",
     utility: "",
   },
+  [CardType.Empty]: {
+    name: "",
+    img: "",
+    details: "",
+    utility: "",
+  },
 };
 
 export const defaultDeck: CardType[] = [

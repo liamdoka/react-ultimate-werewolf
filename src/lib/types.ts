@@ -9,6 +9,7 @@ export enum ServerAction {
 
 export enum GameState {
   Waiting,
+  Starting,
   Running,
   Ended,
 }

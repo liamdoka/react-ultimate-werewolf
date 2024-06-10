@@ -11,6 +11,7 @@ import {
 import { activeRooms } from "../server";
 import { handleUserJoined } from "./lobbyHandlers";
 import { defaultRoom } from "../../lib/constants";
+import { copyOf } from "../../lib/utils";
 
 export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
   if (!payload.roomCode && !payload.nickname) {
@@ -62,12 +63,12 @@ export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
     throw Error("Room already exists");
   }
 
-  const newRoom: Lobby = { ...defaultRoom };
+  const newRoom: Lobby = copyOf(defaultRoom);
   activeRooms.set(payload.roomCode, newRoom);
 };
 
 export const handleChatMessage = (socket: Socket, payload: ChatMessage) => {
-  console.log(`server receieved message: ${payload.message}`);
+  //console.log(`server receieved message: ${payload.message}`);
 
   socket.to(payload.room).emit(ServerAction.ChatMessage, payload);
   socket.emit(ServerAction.ChatMessage, payload);

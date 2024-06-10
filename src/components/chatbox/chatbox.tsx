@@ -102,7 +102,10 @@ export default function Chatbox(props: {
             type="text"
             placeholder="Aa..."
           />
-          <div className="cursor-pointer p-2" onClick={handleSend}>
+          <div
+            className="cursor-pointer p-2 text-yellow-100 transition-colors"
+            onClick={handleSend}
+          >
             <Send />
           </div>
         </div>

@@ -63,7 +63,7 @@ io.on("connection", (socket) => {
 
       //update all lobbies
       if (lobby.players.length > 0) {
-        lobby.admin == lobby.players[0].socketId;
+        lobby.admin = lobby.players[0].socketId;
 
         handleUserDisconnected(socket, {
           roomCode: roomCode,

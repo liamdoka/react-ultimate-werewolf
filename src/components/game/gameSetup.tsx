@@ -128,7 +128,7 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
             </div>
             {isAdmin && (
               <div
-                className={`${props.lobby.discussionTime < MAX_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} cursor-pointer rounded-e-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
+                className={`${props.lobby.discussionTime < MAX_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} rounded-e-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
                 onMouseDown={() =>
                   changeDiscussionTime(DISCUSSION_TIME_STEP_SIZE)
                 }

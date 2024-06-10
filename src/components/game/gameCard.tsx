@@ -14,7 +14,7 @@ export default function GameCard(props: {
   return (
     <div
       onMouseDown={() => props.toggleEnabled()}
-      className={`flex select-none flex-col gap-1 rounded-md bg-slate-700 p-1 shadow-md ${isDisabled} ${isSelectable}`}
+      className={`flex select-none flex-col gap-1 rounded-md bg-slate-700 p-1 shadow-md ${isDisabled} ${isSelectable} transition-opacity`}
     >
       <div className="w-24 overflow-clip rounded-sm">
         <img
