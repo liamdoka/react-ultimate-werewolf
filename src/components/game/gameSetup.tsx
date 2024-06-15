@@ -1,6 +1,5 @@
 import { Lobby, Player, ServerAction } from "../../lib/types";
 import GameCard from "./gameCard";
-import { Socket } from "socket.io-client";
 import { defaultDeck } from "../../lib/allCards";
 import { useEffect, useRef } from "react";
 import { Add, Remove } from "@mui/icons-material";
@@ -11,21 +10,26 @@ import {
 } from "../../lib/constants";
 import CannotRemoveCardToast from "../toasts/cannotRemoveCardToast";
 import { toast } from "react-toastify";
+import { useLobby } from "../../context/lobbyContext";
+import { useClient } from "../../context/clientContext";
 
-export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
-  const numCards = props.lobby.deck.length;
-  const totalCards = props.lobby.players.length + 3;
+export default function GameSetup() {
+  const lobby = useLobby();
+  const client = useClient();
+
+  const numCards = lobby.deck.length;
+  const totalCards = lobby.players.length + 3;
 
   const isLobbyReady = numCards >= totalCards;
-  const isAdmin = props.socket.id === props.lobby.admin;
+  const isAdmin = client.socket?.id === lobby.admin;
 
   const discussionTimeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (discussionTimeRef.current) {
-      discussionTimeRef.current.value = `${props.lobby.discussionTime}`;
+      discussionTimeRef.current.value = `${lobby.discussionTime}`;
     }
-  }, [props.lobby.discussionTime]);
+  }, [lobby.discussionTime]);
 
   const toggleCardEnabled = (cardId: number) => {
     if (!isAdmin) return;
@@ -40,46 +44,46 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
     }
 
     let newDeck;
-    if (props.lobby.deck.includes(cardId) == false) {
+    if (lobby.deck.includes(cardId) == false) {
       // append card to deck - immutably ;)
-      newDeck = [...props.lobby.deck, cardId];
+      newDeck = [...lobby.deck, cardId];
     } else {
       // remove card from deck - immutably :)
-      newDeck = [...props.lobby.deck].filter((id) => id != cardId);
+      newDeck = [...lobby.deck].filter((id) => id != cardId);
     }
 
     const newLobby: Lobby = {
-      ...props.lobby,
+      ...lobby,
       deck: newDeck,
     };
 
-    props.socket.emit(ServerAction.UpdateLobby, newLobby);
+    client.socket?.emit(ServerAction.UpdateLobby, newLobby);
   };
 
   const toggleReady = () => {
-    const newLobby = { ...props.lobby };
+    const newLobby = { ...lobby };
     const playerIndex = newLobby.players.findIndex(
-      (player: Player) => player.socketId === props.socket.id,
+      (player: Player) => player.socketId === client.socket?.id,
     );
 
     newLobby.players[playerIndex].isReady =
       !newLobby.players[playerIndex].isReady;
 
-    props.socket.emit(ServerAction.UpdateLobby, newLobby);
+    client.socket?.emit(ServerAction.UpdateLobby, newLobby);
   };
 
   const changeDiscussionTime = (difference: number) => {
     if (!isAdmin) return;
 
-    const newTime = props.lobby.discussionTime + difference;
+    const newTime = lobby.discussionTime + difference;
 
     if (newTime < MIN_DISCUSSION_TIME || newTime > MAX_DISCUSSION_TIME) return;
 
     const newLobby: Lobby = {
-      ...props.lobby,
+      ...lobby,
       discussionTime: newTime,
     };
-    props.socket.emit(ServerAction.UpdateLobby, newLobby);
+    client.socket?.emit(ServerAction.UpdateLobby, newLobby);
   };
 
   return (
@@ -97,7 +101,7 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
         {defaultDeck.map((card, i) => (
           <GameCard
             cardType={card}
-            enabled={props.lobby.deck.includes(i)}
+            enabled={lobby.deck.includes(i)}
             toggleEnabled={() => toggleCardEnabled(i)}
             selectable={i !== 0 ? isAdmin : false}
             key={`${card}_${i}`}
@@ -110,7 +114,7 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
           <div className="flex flex-row flex-nowrap items-stretch justify-center gap-1">
             {isAdmin && (
               <div
-                className={`${props.lobby.discussionTime > MIN_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} rounded-s-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
+                className={`${lobby.discussionTime > MIN_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} rounded-s-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
                 onMouseDown={() =>
                   changeDiscussionTime(-DISCUSSION_TIME_STEP_SIZE)
                 }
@@ -123,12 +127,12 @@ export default function GameSetup(props: { socket: Socket; lobby: Lobby }) {
               ref={discussionTimeRef}
             >
               <div className="min-w-[3ch] text-center">
-                {props.lobby.discussionTime}
+                {lobby.discussionTime}
               </div>
             </div>
             {isAdmin && (
               <div
-                className={`${props.lobby.discussionTime < MAX_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} rounded-e-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
+                className={`${lobby.discussionTime < MAX_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} rounded-e-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
                 onMouseDown={() =>
                   changeDiscussionTime(DISCUSSION_TIME_STEP_SIZE)
                 }

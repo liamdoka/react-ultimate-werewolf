@@ -4,8 +4,8 @@ import express from "express";
 import {
   ChatMessage,
   Lobby,
+  LoginRequest,
   Player,
-  RoomRequest,
   ServerAction,
 } from "../lib/types";
 import {
@@ -18,6 +18,7 @@ import {
   handleUpdateLobby,
   handleUserDisconnected,
 } from "./sockets/lobbyHandlers";
+import { getRoomCode } from "../lib/utils";
 
 const app = express();
 const server = createServer(app);
@@ -30,26 +31,31 @@ const io = new Server(server, {
 export const activeRooms: Map<string, Lobby> = new Map();
 
 io.on("connection", (socket) => {
-  socket.on(ServerAction.CreateRoom, (payload: RoomRequest) =>
-    handleCreateRoom(socket, payload),
-  );
-  socket.on(ServerAction.JoinRoom, (payload: RoomRequest) =>
-    handleJoinRoom(socket, payload),
-  );
+  console.log(`${socket.id} connected`);
+
+  socket.on(ServerAction.CreateRoom, (payload: LoginRequest) => {
+    handleCreateRoom(socket, payload);
+  });
+  socket.on(ServerAction.JoinRoom, (payload: LoginRequest, callback) => {
+    try {
+      handleJoinRoom(socket, payload);
+      callback(true);
+    } catch (e) {
+      console.error(e);
+    }
+  });
   socket.on(ServerAction.ChatMessage, (payload: ChatMessage) =>
     handleChatMessage(socket, payload),
   );
   socket.on(ServerAction.SyncLobby, () => handleSyncLobby(socket));
-
   socket.on(ServerAction.UpdateLobby, (payload: Lobby) =>
     handleUpdateLobby(socket, payload),
   );
-
   // Handle Disconnect with IO and Socket
   socket.on("disconnecting", (_payload: DisconnectReason) => {
     if (socket.rooms.size > 1) {
       // get RoomCode from socket
-      const roomCode = [...socket.rooms][1];
+      const roomCode = getRoomCode(socket);
       const lobby = activeRooms.get(roomCode);
       if (!lobby) return;
 

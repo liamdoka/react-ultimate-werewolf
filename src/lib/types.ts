@@ -14,6 +14,18 @@ export enum GameState {
   Ended,
 }
 
+export enum ClientAction {
+  ChangeNickname,
+  ChangeRoomCode,
+  ChangeSocket,
+  JoinRoom,
+}
+
+export enum LobbyAction {
+  UpdateIsReady,
+  SyncLobby,
+}
+
 export enum CardType {
   Empty,
   BluSpy,
@@ -39,7 +51,7 @@ export interface StatusCallback {
   status: "failure" | "success";
 }
 
-export interface RoomRequest {
+export interface LoginRequest {
   roomCode: string;
   nickname: string;
 }

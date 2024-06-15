@@ -1,31 +1,19 @@
 import { Done } from "@mui/icons-material";
-import { RoomRequest, ServerAction, StatusCallback } from "../../lib/types";
+import { ClientAction, LoginRequest, ServerAction } from "../../lib/types";
 import { generateRoomCode } from "../../lib/utils";
-import { useEffect, useRef } from "react";
-import { Socket } from "socket.io-client";
+import { useRef } from "react";
+import {
+  ClientPayload,
+  useClient,
+  useClientDispatch,
+} from "../../context/clientContext";
 
-export default function Login(props: {
-  socket: Socket;
-  setLoggedIn: Function;
-  setRoomCode: Function;
-}) {
+export default function Login() {
+  const client = useClient();
+  const clientDispatch = useClientDispatch();
+
   const nicknameRef = useRef<HTMLInputElement>(null);
   const roomCodeRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    props.socket.on(ServerAction.JoinRoomCallback, handleJoinRoomCallback);
-
-    return () => {
-      props.socket.off(ServerAction.JoinRoomCallback);
-    };
-  }, [props.socket]);
-
-  const handleJoinRoomCallback = (res: StatusCallback & RoomRequest) => {
-    if (res.status == "success") {
-      props.setRoomCode(res.roomCode);
-      props.setLoggedIn(true);
-    }
-  };
 
   const handleKeyDown = (ev: React.KeyboardEvent) => {
     if (ev.key == "Enter") {
@@ -55,12 +43,12 @@ export default function Login(props: {
       throw Error("roomCode empty");
     }
 
-    const roomRequest: RoomRequest = {
+    const loginRequest: LoginRequest = {
       nickname: nickname,
       roomCode: roomCode,
     };
 
-    props.socket.emit(ServerAction.JoinRoom, roomRequest);
+    joinRoom(loginRequest);
   };
 
   const handleCreateButton = () => {
@@ -71,14 +59,28 @@ export default function Login(props: {
     }
 
     const newRoomCode = generateRoomCode();
-
-    const roomRequest: RoomRequest = {
+    const loginRequest: LoginRequest = {
       nickname: nickname,
       roomCode: newRoomCode,
     };
 
-    props.socket.emit(ServerAction.CreateRoom, roomRequest);
-    props.socket.emit(ServerAction.JoinRoom, roomRequest);
+    client.socket?.emit(ServerAction.CreateRoom, loginRequest);
+    joinRoom(loginRequest);
+  };
+
+  const joinRoom = (loginRequest: LoginRequest) => {
+    client.socket?.emit(
+      ServerAction.JoinRoom,
+      loginRequest,
+      (success: boolean) => {
+        if (success) {
+          clientDispatch({
+            action: ClientAction.JoinRoom,
+            payload: loginRequest,
+          } satisfies ClientPayload);
+        }
+      },
+    );
   };
 
   return (

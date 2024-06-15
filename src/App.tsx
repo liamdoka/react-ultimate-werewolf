@@ -1,28 +1,23 @@
-import { useState } from "react";
-
-import { io } from "socket.io-client";
 import { Flip, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoginPage from "./pages/loginPage";
 import GamePage from "./pages/gamePage";
-
-const socket = io("ws://localhost:3000");
+import { useClient } from "./context/clientContext";
+import { LobbyProvider } from "./context/lobbyContext";
 
 function App() {
-  const [roomCode, setRoomCode] = useState("");
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  const client = useClient();
+  const isLoggedIn = client.nickname != "" && client.roomCode != "";
 
   return (
     <div className="m-0 flex min-h-full min-w-full flex-col items-center justify-center bg-slate-800 p-0 text-slate-50">
       <main className="m-auto flex h-screen w-full max-w-screen-lg flex-col items-center justify-evenly">
         {isLoggedIn ? (
-          <GamePage roomCode={roomCode} socket={socket} />
+          <LobbyProvider>
+            <GamePage />
+          </LobbyProvider>
         ) : (
-          <LoginPage
-            socket={socket}
-            setLoggedIn={setLoggedIn}
-            setRoomCode={setRoomCode}
-          />
+          <LoginPage />
         )}
         <ToastContainer
           position="bottom-left"

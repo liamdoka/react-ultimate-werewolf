@@ -4,7 +4,7 @@ import {
   ChatMessage,
   Lobby,
   Player,
-  RoomRequest,
+  LoginRequest,
   ServerAction,
   StatusCallback,
 } from "../../lib/types";
@@ -13,7 +13,7 @@ import { handleUserJoined } from "./lobbyHandlers";
 import { defaultRoom } from "../../lib/constants";
 import { copyOf } from "../../lib/utils";
 
-export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
+export const handleJoinRoom = (socket: Socket, payload: LoginRequest) => {
   if (!payload.roomCode && !payload.nickname) {
     throw Error("Invalid arguments");
   }
@@ -48,7 +48,7 @@ export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
 
   socket.join(payload.roomCode);
 
-  const response: StatusCallback & RoomRequest = {
+  const response: StatusCallback & LoginRequest = {
     status: "success",
     nickname: payload.nickname,
     roomCode: payload.roomCode,
@@ -58,7 +58,7 @@ export const handleJoinRoom = (socket: Socket, payload: RoomRequest) => {
   handleUserJoined(socket, { ...payload, ...lobby });
 };
 
-export const handleCreateRoom = (_socket: Socket, payload: RoomRequest) => {
+export const handleCreateRoom = (_socket: Socket, payload: LoginRequest) => {
   if (activeRooms.has(payload.roomCode)) {
     throw Error("Room already exists");
   }

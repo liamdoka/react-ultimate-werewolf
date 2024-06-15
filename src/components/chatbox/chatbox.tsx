@@ -1,27 +1,25 @@
 "use client";
 import { Send } from "@mui/icons-material";
 import { ChatMessage, ServerAction } from "../../lib/types";
-import { Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import ChatboxMessage from "./chatboxMessage";
+import { useClient } from "../../context/clientContext";
 
-export default function Chatbox(props: {
-  socket: Socket;
-  nickname: string;
-  roomCode: string;
-}) {
+export default function Chatbox() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const chatboxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const client = useClient();
+
   useEffect(() => {
-    props.socket.on(ServerAction.ChatMessage, handleChatMessage);
+    client.socket?.on(ServerAction.ChatMessage, handleChatMessage);
 
     // cleanup function so that it doesnt render twice
     return () => {
-      props.socket.off(ServerAction.ChatMessage);
+      client.socket?.off(ServerAction.ChatMessage, handleChatMessage);
     };
-  }, [props.socket]);
+  }, [client.socket]);
 
   useEffect(() => {
     scrollChat();
@@ -55,12 +53,12 @@ export default function Chatbox(props: {
   const sendMessage = (message: string) => {
     const messageObject: ChatMessage = {
       message: message,
-      sender: props.nickname,
-      room: props.roomCode,
+      sender: client.nickname,
+      room: client.roomCode,
       iat: Date.now(),
     };
 
-    props.socket.emit(ServerAction.ChatMessage, messageObject);
+    client.socket?.emit(ServerAction.ChatMessage, messageObject);
   };
 
   return (
@@ -86,7 +84,7 @@ export default function Chatbox(props: {
                 ) : (
                   <ChatboxMessage
                     key={message.iat}
-                    self={message.sender == props.nickname}
+                    self={message.sender == client.nickname}
                     {...message}
                   />
                 ),

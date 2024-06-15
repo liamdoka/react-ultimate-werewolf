@@ -1,30 +1,38 @@
-import { Socket } from "socket.io-client";
 import Chatbox from "../components/chatbox/chatbox";
-import RoomCode from "../components/roomcode/roomcode";
+import RoomCode from "../components/roomCode/roomCode";
 import LobbyMenu from "../components/lobby/lobby";
 import GameSetup from "../components/game/gameSetup";
 import { useEffect, useState } from "react";
-import { GameState, Lobby, Player, ServerAction } from "../lib/types";
-import { COUNTDOWN_TIME } from "../lib/constants";
+import {
+  GameState,
+  Lobby,
+  LobbyAction,
+  Player,
+  ServerAction,
+} from "../lib/types";
+import {
+  LobbyPayload,
+  useLobby,
+  useLobbyDispatch,
+} from "../context/lobbyContext";
+import { useClient } from "../context/clientContext";
 
-export default function GamePage(props: { socket: Socket; roomCode: string }) {
-  const [lobby, setLobby] = useState<Lobby>();
+export default function GamePage() {
   const [isStarting, setIsStarting] = useState<boolean>(false);
-  const [timeToStart, setTimeToStart] = useState<number>(10);
-  const [timeoutId, setTimeoutId] = useState<Timer>();
-  const [self, setSelf] = useState<Player>();
-  const isAdmin = self?.socketId == lobby?.admin;
+
+  const lobby = useLobby();
+  const lobbyDispatch = useLobbyDispatch();
+
+  const client = useClient();
+  const isAdmin = client.socket?.id == lobby?.admin;
 
   useEffect(() => {
-    setSelf(
-      lobby?.players.find((player) => player.socketId === props.socket.id),
-    );
-  });
-
-  useEffect(() => {
-    props.socket.on(ServerAction.SyncLobby, (payload: Lobby) => {
-      setLobby(payload);
-      setIsStarting(payload.state == GameState.Starting);
+    client.socket?.on(ServerAction.SyncLobby, (payload: Lobby) => {
+      lobbyDispatch({
+        action: LobbyAction.SyncLobby,
+        socketId: client.socket?.id ?? "",
+        payload: payload,
+      } satisfies LobbyPayload);
 
       if (isAdmin) {
         checkStartGame(payload);
@@ -36,12 +44,12 @@ export default function GamePage(props: { socket: Socket; roomCode: string }) {
     });
 
     // requests the lobby once upon joining
-    props.socket.emit(ServerAction.SyncLobby);
+    client.socket?.emit(ServerAction.SyncLobby);
 
     return () => {
-      props.socket.off(ServerAction.SyncLobby);
+      client.socket?.off(ServerAction.SyncLobby);
     };
-  }, []);
+  }, [client]);
 
   //TODO: THis effect doesnt work and i want to switch to useReducer
   // useEffect(() => {
@@ -72,7 +80,7 @@ export default function GamePage(props: { socket: Socket; roomCode: string }) {
   //           state: GameState.Waiting,
   //         };
 
-  //         props.socket.emit(ServerAction.UpdateLobby, waitingLobby);
+  //         client.socket?.emit(ServerAction.UpdateLobby, waitingLobby);
   //         clearInterval(newTimeoutId);
   //         return;
   //       }
@@ -110,7 +118,7 @@ export default function GamePage(props: { socket: Socket; roomCode: string }) {
           ..._lobby,
           state: GameState.Waiting,
         };
-        props.socket.emit(ServerAction.UpdateLobby, newLobby);
+        client.socket?.emit(ServerAction.UpdateLobby, newLobby);
       }
     }
   };
@@ -124,39 +132,35 @@ export default function GamePage(props: { socket: Socket; roomCode: string }) {
       state: GameState.Starting,
     };
 
-    props.socket.emit(ServerAction.UpdateLobby, newLobby);
+    client.socket?.emit(ServerAction.UpdateLobby, newLobby);
     setIsStarting(true);
   };
 
-  const handleStartGame = () => {
-    if (lobby?.state !== GameState.Starting) return;
-    if (isStarting == false) return;
+  // const handleStartGame = () => {
+  //   if (lobby?.state !== GameState.Starting) return;
+  //   if (isStarting == false) return;
 
-    const newLobby: Lobby = {
-      ...lobby,
-      state: GameState.Running,
-    };
+  //   const newLobby: Lobby = {
+  //     ...lobby,
+  //     state: GameState.Running,
+  //   };
 
-    props.socket.emit(ServerAction.UpdateLobby, newLobby);
-  };
+  //   client.socket?.emit(ServerAction.UpdateLobby, newLobby);
+  // };
 
   return (
-    <div className="flex flex-row gap-4">
+    <>
       {lobby && (
-        <>
+        <div className="flex flex-row gap-4">
           <div className="flex flex-col items-center gap-4">
-            <RoomCode code={props.roomCode} />
-            <LobbyMenu socket={props.socket} lobby={lobby} />
+            <RoomCode code={client.roomCode} />
+            <LobbyMenu />
           </div>
 
-          <GameSetup socket={props.socket} lobby={lobby} />
-          <Chatbox
-            socket={props.socket}
-            nickname={self?.nickname ?? "_"}
-            roomCode={props.roomCode}
-          />
-        </>
+          <GameSetup />
+          <Chatbox />
+        </div>
       )}
-    </div>
+    </>
   );
 }

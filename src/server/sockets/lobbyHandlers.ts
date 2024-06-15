@@ -1,5 +1,10 @@
 import { Socket } from "socket.io";
-import { ChatMessage, Lobby, RoomRequest, ServerAction } from "../../lib/types";
+import {
+  ChatMessage,
+  Lobby,
+  LoginRequest,
+  ServerAction,
+} from "../../lib/types";
 import { getRoomCode } from "../../lib/utils";
 import { activeRooms } from "../server";
 
@@ -12,7 +17,7 @@ export const handleSyncLobby = (socket: Socket) => {
   socket.emit(ServerAction.SyncLobby, lobby);
 };
 
-export const handleUserJoined = (socket: Socket, payload: RoomRequest) => {
+export const handleUserJoined = (socket: Socket, payload: LoginRequest) => {
   const roomCode = getRoomCode(socket);
 
   const serverChatMessage: ChatMessage = {
@@ -28,7 +33,7 @@ export const handleUserJoined = (socket: Socket, payload: RoomRequest) => {
 
 export const handleUserDisconnected = (
   socket: Socket,
-  payload: RoomRequest,
+  payload: LoginRequest,
 ) => {
   const roomCode = payload.roomCode ?? getRoomCode(socket);
 
