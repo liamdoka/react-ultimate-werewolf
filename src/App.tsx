@@ -1,5 +1,5 @@
-import { Flip, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Flip, ToastContainer } from "react-toastify";
 import LoginPage from "./pages/loginPage";
 import GamePage from "./pages/gamePage";
 import { useClient } from "./context/clientContext";

@@ -1,7 +1,7 @@
 import { allCards } from "../../lib/allCards";
 import { CardDetails, CardType } from "../../lib/types";
 
-export default function GameCard(props: {
+export default function SetupCard(props: {
   cardType: CardType;
   enabled?: boolean;
   toggleEnabled: Function;

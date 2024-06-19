@@ -1,9 +1,10 @@
 import { Lobby, Player, ServerAction } from "../../lib/types";
-import GameCard from "./gameCard";
+import SetupCard from "./setupCard";
 import { defaultDeck } from "../../lib/allCards";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
+  COUNTDOWN_TIME,
   DISCUSSION_TIME_STEP_SIZE,
   MAX_DISCUSSION_TIME,
   MIN_DISCUSSION_TIME,
@@ -13,7 +14,9 @@ import { toast } from "react-toastify";
 import { useLobby } from "../../context/lobbyContext";
 import { useClient } from "../../context/clientContext";
 
-export default function GameSetup() {
+export default function Setup(props: { timeToStart: number }) {
+  const [isReady, setIsReady] = useState<boolean>(false);
+
   const lobby = useLobby();
   const client = useClient();
 
@@ -66,9 +69,8 @@ export default function GameSetup() {
       (player: Player) => player.socketId === client.socket?.id,
     );
 
-    newLobby.players[playerIndex].isReady =
-      !newLobby.players[playerIndex].isReady;
-
+    newLobby.players[playerIndex].isReady = !isReady;
+    setIsReady(!isReady);
     client.socket?.emit(ServerAction.UpdateLobby, newLobby);
   };
 
@@ -99,7 +101,7 @@ export default function GameSetup() {
       </div>
       <div className="flex flex-grow flex-wrap items-center justify-center gap-1 rounded-md bg-slate-800 p-2">
         {defaultDeck.map((card, i) => (
-          <GameCard
+          <SetupCard
             cardType={card}
             enabled={lobby.deck.includes(i)}
             toggleEnabled={() => toggleCardEnabled(i)}
@@ -145,10 +147,10 @@ export default function GameSetup() {
         </div>
         {isLobbyReady ? (
           <div
-            className={`basis-full rounded-md bg-slate-800 p-2 text-center font-bold`}
+            className={`basis-full cursor-pointer rounded-md ${isReady ? "bg-emerald-800" : "bg-slate-800"} p-2 text-center font-bold`}
             onClick={toggleReady}
           >
-            Ready
+            {props.timeToStart === COUNTDOWN_TIME ? "Ready" : props.timeToStart}
           </div>
         ) : (
           <div className="basis-full rounded-md p-2 text-center">
