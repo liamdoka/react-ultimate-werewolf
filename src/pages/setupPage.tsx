@@ -13,21 +13,24 @@ import { useClient } from "../context/clientContext";
 import { COUNTDOWN_TIME } from "../lib/constants";
 import { useInterval } from "../lib/utils";
 
+
+// TODO: Still not working i fear
 export default function GamePage() {
   const [timeToStart, setTimeToStart] = useState<number>(COUNTDOWN_TIME);
   const [isStarting, setIsStarting] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const lobby = useLobby();
   const lobbyDispatch = useLobbyDispatch();
 
   const client = useClient();
-  const isAdmin = client.socket?.id == lobby?.admin;
 
   // update lobby on server action
   useEffect(() => {
     client.socket?.on(ServerAction.SyncLobby, handleSyncLobby);
 
     function handleSyncLobby(payload: Lobby) {
+      console.log("syncing the lobby")
       lobbyDispatch({
         action: LobbyAction.SyncLobby,
         socketId: client.socket?.id ?? "",
@@ -43,8 +46,6 @@ export default function GamePage() {
       }
     }
 
-    console.log("oneitme");
-
     // requests the lobby once upon joining
     client.socket?.emit(ServerAction.SyncLobby);
 
@@ -52,6 +53,11 @@ export default function GamePage() {
       client.socket?.off(ServerAction.SyncLobby, handleSyncLobby);
     };
   }, [client.socket]);
+
+  // set the admin every time the lobby changes
+  useEffect(() => {
+    setIsAdmin(client.socket?.id == lobby?.admin)
+  }, [lobby, client])
 
   // start countdown timer on gamestate change
   useEffect(() => {
@@ -61,7 +67,7 @@ export default function GamePage() {
       setIsStarting(false);
       setTimeToStart(COUNTDOWN_TIME);
     }
-  }, [lobby.state]);
+  }, [lobby]);
 
   useInterval(
     () => {

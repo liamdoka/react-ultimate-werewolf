@@ -29,6 +29,10 @@ export default function Setup(props: { timeToStart: number }) {
   const discussionTimeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    client.socket?.emit(ServerAction.SyncLobby);
+  }, [])
+
+  useEffect(() => {
     if (discussionTimeRef.current) {
       discussionTimeRef.current.value = `${lobby.discussionTime}`;
     }

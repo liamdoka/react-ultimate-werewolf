@@ -1,6 +1,12 @@
 import { CardDetails, CardType } from "./types";
 
 export const allCards: Record<CardType, CardDetails> = {
+  [CardType.Empty]: {
+    name: "Empty",
+    img: "back.png",
+    details: "",
+    utility: "",
+  },
   [CardType.BluSpy]: {
     name: "Blu Spy",
     img: "blu_spy.png",
@@ -58,12 +64,6 @@ export const allCards: Record<CardType, CardDetails> = {
   [CardType.Spy]: {
     name: "Spy",
     img: "spy.png",
-    details: "",
-    utility: "",
-  },
-  [CardType.Empty]: {
-    name: "",
-    img: "",
     details: "",
     utility: "",
   },
