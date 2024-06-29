@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { useLobby } from "../../context/lobbyContext";
 import { useClient } from "../../context/clientContext";
 
-export default function Setup(props: { timeToStart: number }) {
+export default function Setup(props: { timeToStart: number, isAdmin: boolean }) {
   const [isReady, setIsReady] = useState<boolean>(false);
 
   const lobby = useLobby();
@@ -24,7 +24,6 @@ export default function Setup(props: { timeToStart: number }) {
   const totalCards = lobby.players.length + 3;
 
   const isLobbyReady = numCards >= totalCards;
-  const isAdmin = client.socket?.id === lobby.admin;
 
   const discussionTimeRef = useRef<HTMLInputElement>(null);
 
@@ -39,7 +38,7 @@ export default function Setup(props: { timeToStart: number }) {
   }, [lobby.discussionTime]);
 
   const toggleCardEnabled = (cardId: number) => {
-    if (!isAdmin) return;
+    if (!props.isAdmin) return;
 
     if (cardId === 0) {
       toast(<CannotRemoveCardToast />, {
@@ -79,7 +78,7 @@ export default function Setup(props: { timeToStart: number }) {
   };
 
   const changeDiscussionTime = (difference: number) => {
-    if (!isAdmin) return;
+    if (!props.isAdmin) return;
 
     const newTime = lobby.discussionTime + difference;
 
@@ -109,7 +108,7 @@ export default function Setup(props: { timeToStart: number }) {
             cardType={card}
             enabled={lobby.deck.includes(i)}
             toggleEnabled={() => toggleCardEnabled(i)}
-            selectable={i !== 0 ? isAdmin : false}
+            selectable={i !== 0 ? props.isAdmin : false}
             key={`${card}_${i}`}
           />
         ))}
@@ -118,7 +117,7 @@ export default function Setup(props: { timeToStart: number }) {
         <div className="flex basis-full flex-row flex-nowrap items-center justify-center gap-2 rounded-md bg-slate-800 p-2">
           <div>Discussion time:</div>
           <div className="flex flex-row flex-nowrap items-stretch justify-center gap-1">
-            {isAdmin && (
+            {props.isAdmin && (
               <div
                 className={`${lobby.discussionTime > MIN_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} rounded-s-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
                 onMouseDown={() =>
@@ -129,14 +128,14 @@ export default function Setup(props: { timeToStart: number }) {
               </div>
             )}
             <div
-              className={`${!isAdmin && "rounded-md"} bg-slate-700 px-2 font-mono text-lg font-bold`}
+              className={`${!props.isAdmin && "rounded-md"} bg-slate-700 px-2 font-mono text-lg font-bold`}
               ref={discussionTimeRef}
             >
               <div className="min-w-[3ch] text-center">
                 {lobby.discussionTime}
               </div>
             </div>
-            {isAdmin && (
+            {props.isAdmin && (
               <div
                 className={`${lobby.discussionTime < MAX_DISCUSSION_TIME ? "cursor-pointer" : "cursor-not-allowed"} rounded-e-md bg-slate-700 px-1 text-slate-400 hover:text-slate-50`}
                 onMouseDown={() =>

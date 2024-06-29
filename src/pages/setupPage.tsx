@@ -30,7 +30,6 @@ export default function GamePage() {
     client.socket?.on(ServerAction.SyncLobby, handleSyncLobby);
 
     function handleSyncLobby(payload: Lobby) {
-      console.log("syncing the lobby")
       lobbyDispatch({
         action: LobbyAction.SyncLobby,
         socketId: client.socket?.id ?? "",
@@ -52,7 +51,7 @@ export default function GamePage() {
     return () => {
       client.socket?.off(ServerAction.SyncLobby, handleSyncLobby);
     };
-  }, [client.socket]);
+  }, [client.socket, isAdmin]);
 
   // set the admin every time the lobby changes
   useEffect(() => {
@@ -105,8 +104,6 @@ export default function GamePage() {
         client.socket?.emit(ServerAction.UpdateLobby, newLobby);
       }
     }
-
-    console.log("check start game");
   };
 
   const initiateStartGame = (_lobby: Lobby) => {
@@ -118,13 +115,10 @@ export default function GamePage() {
       state: GameState.Starting,
     };
 
-    console.log("initiate start game");
     client.socket?.emit(ServerAction.UpdateLobby, newLobby);
   };
 
   const handleStartGame = () => {
-    console.log("handling start game");
-    console.log(lobby);
     if (lobby?.state !== GameState.Starting) return;
 
     const newLobby: Lobby = {
@@ -144,7 +138,7 @@ export default function GamePage() {
             <LobbyMenu />
           </div>
 
-          <Setup timeToStart={timeToStart} />
+          <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
           <Chatbox />
         </div>
       )}
