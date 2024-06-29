@@ -6,15 +6,14 @@ import {
   ServerAction,
 } from "../../lib/types";
 import { getRoomCode } from "../../lib/utils";
-import { activeRooms } from "../server";
+import { activeRooms, io } from "../server";
 
 // source of truth is the server
 export const handleSyncLobby = (socket: Socket) => {
   const roomCode = getRoomCode(socket);
   const lobby = activeRooms.get(roomCode);
 
-  socket.to(roomCode).emit(ServerAction.SyncLobby, lobby);
-  socket.emit(ServerAction.SyncLobby, lobby);
+  io.to(roomCode).emit(ServerAction.SyncLobby, lobby);
 };
 
 export const handleUserJoined = (socket: Socket, payload: LoginRequest) => {
@@ -44,7 +43,7 @@ export const handleUserDisconnected = (
     iat: Date.now(),
   };
 
-  socket.to(roomCode).emit(ServerAction.ChatMessage, serverChatMessage);
+  io.to(roomCode).emit(ServerAction.ChatMessage, serverChatMessage);
   handleSyncLobby(socket);
 };
 
@@ -53,6 +52,5 @@ export const handleUpdateLobby = (socket: Socket, payload: Lobby) => {
   const roomCode = getRoomCode(socket);
 
   activeRooms.set(roomCode, payload);
-  socket.to(roomCode).emit(ServerAction.SyncLobby, payload);
-  socket.emit(ServerAction.SyncLobby, payload);
+  io.to(roomCode).emit(ServerAction.SyncLobby, payload);
 };

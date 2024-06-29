@@ -5,6 +5,8 @@ export enum ServerAction {
   ChatMessage = "ChatMessage",
   SyncLobby = "SyncLobby",
   UpdateLobby = "UpdateLobby",
+  StartGame = "StartGame",
+  SetCard = "SetCard",
 }
 
 export enum GameState {
@@ -64,11 +66,17 @@ export interface Lobby {
   discussionTime: number;
 }
 
+export interface Game {
+  // socketID => CardType
+  playerCards: Map<string, CardType>;
+  // Game State Probably
+  // other stuff
+}
+
 export interface Player {
   socketId: string;
   nickname: string;
   isReady: boolean;
-  card: CardType;
 }
 
 export interface ChatMessage {

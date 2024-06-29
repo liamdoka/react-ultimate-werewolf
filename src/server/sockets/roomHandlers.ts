@@ -1,14 +1,12 @@
 import { Socket } from "socket.io";
 import {
-  CardType,
   ChatMessage,
   Lobby,
   Player,
   LoginRequest,
   ServerAction,
-  StatusCallback,
 } from "../../lib/types";
-import { activeRooms } from "../server";
+import { activeRooms, io } from "../server";
 import { handleUserJoined } from "./lobbyHandlers";
 import { defaultRoom } from "../../lib/constants";
 import { copyOf } from "../../lib/utils";
@@ -36,7 +34,6 @@ export const handleJoinRoom = (socket: Socket, payload: LoginRequest) => {
   const newPlayer: Player = {
     socketId: socket.id,
     nickname: payload.nickname,
-    card: CardType.Empty,
     isReady: false,
   };
 
@@ -47,29 +44,16 @@ export const handleJoinRoom = (socket: Socket, payload: LoginRequest) => {
   lobby.players.push(newPlayer);
 
   socket.join(payload.roomCode);
-
-  const response: StatusCallback & LoginRequest = {
-    status: "success",
-    nickname: payload.nickname,
-    roomCode: payload.roomCode,
-  };
-
-  socket.emit(ServerAction.JoinRoomCallback, response);
-  handleUserJoined(socket, { ...payload, ...lobby });
+  handleUserJoined(socket, payload);
 };
 
 export const handleCreateRoom = (_socket: Socket, payload: LoginRequest) => {
-  if (activeRooms.has(payload.roomCode)) {
-    throw Error("Room already exists");
-  }
+  if (activeRooms.has(payload.roomCode)) throw Error("Room already exists");
 
   const newRoom: Lobby = copyOf(defaultRoom);
   activeRooms.set(payload.roomCode, newRoom);
 };
 
-export const handleChatMessage = (socket: Socket, payload: ChatMessage) => {
-  //console.log(`server receieved message: ${payload.message}`);
-
-  socket.to(payload.room).emit(ServerAction.ChatMessage, payload);
-  socket.emit(ServerAction.ChatMessage, payload);
+export const handleChatMessage = (payload: ChatMessage) => {
+  io.to(payload.room).emit(ServerAction.ChatMessage, payload);
 };

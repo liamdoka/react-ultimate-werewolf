@@ -13,8 +13,12 @@ import CannotRemoveCardToast from "../toasts/cannotRemoveCardToast";
 import { toast } from "react-toastify";
 import { useLobby } from "../../context/lobbyContext";
 import { useClient } from "../../context/clientContext";
+import { AdminError } from "../../lib/errors";
 
-export default function Setup(props: { timeToStart: number, isAdmin: boolean }) {
+export default function Setup(props: {
+  timeToStart: number;
+  isAdmin: boolean;
+}) {
   const [isReady, setIsReady] = useState<boolean>(false);
 
   const lobby = useLobby();
@@ -29,7 +33,7 @@ export default function Setup(props: { timeToStart: number, isAdmin: boolean }) 
 
   useEffect(() => {
     client.socket?.emit(ServerAction.SyncLobby);
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (discussionTimeRef.current) {
@@ -38,7 +42,7 @@ export default function Setup(props: { timeToStart: number, isAdmin: boolean }) 
   }, [lobby.discussionTime]);
 
   const toggleCardEnabled = (cardId: number) => {
-    if (!props.isAdmin) return;
+    if (!props.isAdmin) throw AdminError();
 
     if (cardId === 0) {
       toast(<CannotRemoveCardToast />, {
@@ -78,7 +82,7 @@ export default function Setup(props: { timeToStart: number, isAdmin: boolean }) 
   };
 
   const changeDiscussionTime = (difference: number) => {
-    if (!props.isAdmin) return;
+    if (!props.isAdmin) throw AdminError();
 
     const newTime = lobby.discussionTime + difference;
 

@@ -17,6 +17,26 @@ export function copyOf<T>(object: T): T {
   return JSON.parse(JSON.stringify(object));
 }
 
+export function shuffled<T>(array: T[]): T[] {
+  let currentIndex: number = array.length;
+  const newArray = copyOf(array);
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [newArray[currentIndex], newArray[randomIndex]] = [
+      newArray[randomIndex],
+      newArray[currentIndex],
+    ];
+  }
+
+  return newArray;
+}
+
 export function useInterval(callback: () => void, delay: number | null) {
   const savedCallback = useRef<(() => void) | null>(null);
 

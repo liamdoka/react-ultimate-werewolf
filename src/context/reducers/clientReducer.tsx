@@ -18,9 +18,7 @@ export function clientReducer(state: Client, payload: ClientPayload) {
 }
 
 const handleChangeSocket = (state: Client, payload: ClientPayload) => {
-  if (payload.payload instanceof Socket == false) {
-    throw Error("Invalid arguments");
-  }
+  if (payload.payload instanceof Socket == false) throw TypeError();
 
   const newClient: Client = {
     ...state,
@@ -31,9 +29,7 @@ const handleChangeSocket = (state: Client, payload: ClientPayload) => {
 };
 
 const handleChangeNickname = (state: Client, payload: ClientPayload) => {
-  if (typeof payload.payload !== "string") {
-    throw Error("Invalid arguments");
-  }
+  if (typeof payload.payload !== "string") throw TypeError();
 
   const newClient: Client = {
     ...state,
@@ -44,9 +40,7 @@ const handleChangeNickname = (state: Client, payload: ClientPayload) => {
 };
 
 function handleChangeRoomCode(state: Client, payload: ClientPayload) {
-  if (typeof payload.payload !== "string") {
-    throw Error("Invalid arguments");
-  }
+  if (typeof payload.payload !== "string") throw TypeError();
 
   const newClient: Client = {
     ...state,
@@ -59,8 +53,8 @@ function handleChangeRoomCode(state: Client, payload: ClientPayload) {
 function handleJoinRoom(state: Client, payload: ClientPayload) {
   const { nickname, roomCode } = payload.payload as LoginRequest;
 
-  if (typeof nickname !== "string") throw Error("Invalid nickame");
-  if (typeof roomCode !== "string") throw Error("Invalid roomcode");
+  if (typeof nickname !== "string") throw TypeError("nickname");
+  if (typeof roomCode !== "string") throw TypeError("roomCode");
 
   const newClient: Client = {
     ...state,

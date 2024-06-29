@@ -7,6 +7,7 @@ import {
   useClient,
   useClientDispatch,
 } from "../../context/clientContext";
+import { ValueEmptyError } from "../../lib/errors";
 
 export default function Login() {
   const client = useClient();
@@ -35,13 +36,8 @@ export default function Login() {
     const nickname = nicknameRef.current?.value;
     const roomCode = roomCodeRef.current?.value;
 
-    if (!nickname || nickname.trim() == "") {
-      throw Error("nickname empty");
-    }
-
-    if (!roomCode || roomCode.trim() == "") {
-      throw Error("roomCode empty");
-    }
+    if (!nickname || nickname.trim() == "") throw ValueEmptyError("nickname");
+    if (!roomCode || roomCode.trim() == "") throw ValueEmptyError("roomCode");
 
     const loginRequest: LoginRequest = {
       nickname: nickname,
@@ -54,18 +50,29 @@ export default function Login() {
   const handleCreateButton = () => {
     const nickname = nicknameRef.current?.value;
 
-    if (!nickname || nickname.trim() == "") {
-      throw Error("nickname empty");
-    }
+    if (!nickname || nickname.trim() == "") throw ValueEmptyError("nickname");
 
     const newRoomCode = generateRoomCode();
     const loginRequest: LoginRequest = {
       nickname: nickname,
       roomCode: newRoomCode,
     };
+    createRoom(loginRequest);
+  };
 
-    client.socket?.emit(ServerAction.CreateRoom, loginRequest);
-    joinRoom(loginRequest);
+  const createRoom = (loginRequest: LoginRequest) => {
+    client.socket?.emit(
+      ServerAction.CreateRoom,
+      loginRequest,
+      (success: boolean) => {
+        if (success) {
+          joinRoom(loginRequest);
+        } else {
+          //TODO: represent this in the ui somehow
+          console.log("failed to create room");
+        }
+      },
+    );
   };
 
   const joinRoom = (loginRequest: LoginRequest) => {
@@ -78,6 +85,9 @@ export default function Login() {
             action: ClientAction.JoinRoom,
             payload: loginRequest,
           } satisfies ClientPayload);
+        } else {
+          //TODO: represent this in the UI somhow
+          console.log("failed to join room");
         }
       },
     );
@@ -114,6 +124,7 @@ export default function Login() {
           </button>
         </div>
 
+        {/* divider */}
         <p className="text-center leading-3 text-slate-400">- or -</p>
 
         {/* create room */}

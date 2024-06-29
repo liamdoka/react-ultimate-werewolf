@@ -9,7 +9,7 @@ export function lobbyReducer(state: Lobby, payload: LobbyPayload) {
     case LobbyAction.SyncLobby:
       return handleSyncLobby(state, payload);
     default:
-      return state;
+      throw Error("Unknown LobbyAction");
   }
 }
 

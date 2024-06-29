@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import express from "express";
 import {
   ChatMessage,
+  Game,
   Lobby,
   LoginRequest,
   Player,
@@ -19,42 +20,56 @@ import {
   handleUserDisconnected,
 } from "./sockets/lobbyHandlers";
 import { getRoomCode } from "../lib/utils";
+import { handleStartGame } from "./sockets/gameHandlers";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
   },
 });
 
 export const activeRooms: Map<string, Lobby> = new Map();
+export const activeGames: Map<string, Game> = new Map();
 
 io.on("connection", (socket) => {
   console.log(`${socket.id} connected`);
 
-  socket.on(ServerAction.CreateRoom, (payload: LoginRequest) => {
-    handleCreateRoom(socket, payload);
+  // Create Room
+  socket.on(ServerAction.CreateRoom, (payload: LoginRequest, callback) => {
+    try {
+      handleCreateRoom(socket, payload);
+      callback(true);
+    } catch (e) {
+      console.error(e);
+      callback(false);
+    }
   });
+
+  // Join Room
   socket.on(ServerAction.JoinRoom, (payload: LoginRequest, callback) => {
     try {
       handleJoinRoom(socket, payload);
       callback(true);
     } catch (e) {
       console.error(e);
+      callback(false);
     }
   });
   socket.on(ServerAction.ChatMessage, (payload: ChatMessage) =>
-    handleChatMessage(socket, payload),
+    handleChatMessage(payload),
   );
   socket.on(ServerAction.SyncLobby, () => handleSyncLobby(socket));
   socket.on(ServerAction.UpdateLobby, (payload: Lobby) =>
     handleUpdateLobby(socket, payload),
   );
+  socket.on(ServerAction.StartGame, (payload: Lobby) =>
+    handleStartGame(socket, payload),
+  );
   // Handle Disconnect with IO and Socket
-  socket.on("disconnecting", (_payload: DisconnectReason) => {
+  socket.on("disconnecting", (_: DisconnectReason) => {
     if (socket.rooms.size > 1) {
-      // get RoomCode from socket
       const roomCode = getRoomCode(socket);
       const lobby = activeRooms.get(roomCode);
       if (!lobby) return;

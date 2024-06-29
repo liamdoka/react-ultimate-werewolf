@@ -13,8 +13,6 @@ import { useClient } from "../context/clientContext";
 import { COUNTDOWN_TIME } from "../lib/constants";
 import { useInterval } from "../lib/utils";
 
-
-// TODO: Still not working i fear
 export default function GamePage() {
   const [timeToStart, setTimeToStart] = useState<number>(COUNTDOWN_TIME);
   const [isStarting, setIsStarting] = useState<boolean>(false);
@@ -39,10 +37,6 @@ export default function GamePage() {
       if (isAdmin) {
         checkStartGame(payload);
       }
-
-      if (payload.state == GameState.Running) {
-        console.log("THE GAME IS RUNNING DAYMN");
-      }
     }
 
     // requests the lobby once upon joining
@@ -55,8 +49,8 @@ export default function GamePage() {
 
   // set the admin every time the lobby changes
   useEffect(() => {
-    setIsAdmin(client.socket?.id == lobby?.admin)
-  }, [lobby, client])
+    setIsAdmin(client.socket?.id == lobby?.admin);
+  }, [lobby, client]);
 
   // start countdown timer on gamestate change
   useEffect(() => {
@@ -93,7 +87,7 @@ export default function GamePage() {
 
     // if all players are ready, start the game
     if (arePlayersReady) {
-      initiateStartGame(_lobby);
+      initiateCountdown(_lobby);
     } else {
       // if the players are no longer ready, change the state
       if (_lobby.state === GameState.Starting) {
@@ -106,7 +100,7 @@ export default function GamePage() {
     }
   };
 
-  const initiateStartGame = (_lobby: Lobby) => {
+  const initiateCountdown = (_lobby: Lobby) => {
     if (_lobby.state !== GameState.Waiting) return;
     // if (_lobby.players.length < 2) return;
 
@@ -126,7 +120,7 @@ export default function GamePage() {
       state: GameState.Running,
     };
 
-    client.socket?.emit(ServerAction.UpdateLobby, newLobby);
+    client.socket?.emit(ServerAction.StartGame, newLobby);
   };
 
   return (
