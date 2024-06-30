@@ -11,7 +11,8 @@ export const allCards: Record<CardType, CardDetails> = {
     name: "Blu Spy",
     img: "blu_spy.png",
     details: "",
-    utility: "",
+    utility:
+      "If there is only one BLU SPY, look at a card from the middle.\nIf there are two, do nothing.",
   },
   [CardType.Demoman]: {
     name: "Demoman",

@@ -10,6 +10,9 @@ export const COUNTDOWN_TIME = 3;
 export const MIN_RIVER_CARDS = 3;
 export const MIN_PLAYERS = 1;
 
+export const CARD_ROTATION_FACTOR = 30;
+export const CARD_ROTATION_DURATION = 5;
+
 export const defaultRoom: Lobby = {
   players: [],
   deck: [0],

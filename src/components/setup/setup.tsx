@@ -86,7 +86,9 @@ export default function Setup(props: {
 
     const newTime = lobby.discussionTime + difference;
 
-    if (newTime < MIN_DISCUSSION_TIME || newTime > MAX_DISCUSSION_TIME) return;
+    if (newTime < MIN_DISCUSSION_TIME || newTime > MAX_DISCUSSION_TIME) {
+      throw RangeError();
+    }
 
     const newLobby: Lobby = {
       ...lobby,

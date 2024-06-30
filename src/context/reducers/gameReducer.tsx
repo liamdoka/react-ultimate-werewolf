@@ -24,9 +24,6 @@ function handleSetCard(state: GamePlayer, payload: GamePayload) {
     initialCard: card,
   };
 
-  const cardDetails: CardDetails = allCards[card];
-  console.log(cardDetails);
-
   return newGamePlayer;
 }
 

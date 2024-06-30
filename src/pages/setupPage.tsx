@@ -113,7 +113,7 @@ export default function GamePage() {
   };
 
   const handleStartGame = () => {
-    if (lobby?.state !== GameState.Starting) return;
+    if (lobby?.state !== GameState.Starting) throw TypeError();
 
     const newLobby: Lobby = {
       ...lobby,

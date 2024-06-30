@@ -86,7 +86,7 @@ io.on("connection", (socket) => {
     if (socket.rooms.size > 1) {
       const roomCode = getRoomCode(socket);
       const lobby = activeRooms.get(roomCode);
-      if (!lobby) return;
+      if (!lobby) throw Error("Lobby does not exist");
 
       const currentPlayer = lobby.players.find(
         (player: Player) => player.socketId == socket.id,
