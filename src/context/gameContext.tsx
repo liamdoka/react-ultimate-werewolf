@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer } from "react";
-import { CardType } from "../lib/types";
+import { CardType, GameAction } from "../lib/types";
 import { copyOf } from "../lib/utils";
 import { defaultGamePlayer } from "../lib/constants";
 import { gameReducer } from "./reducers/gameReducer";
@@ -7,11 +7,6 @@ import { gameReducer } from "./reducers/gameReducer";
 export interface GamePlayer {
   initialCard: CardType;
   endCard: CardType;
-}
-
-export enum GameAction {
-  SetCard,
-  CheckCard,
 }
 
 export type GamePayload = {

@@ -20,7 +20,12 @@ import {
   handleUserDisconnected,
 } from "./sockets/lobbyHandlers";
 import { getRoomCode } from "../lib/utils";
-import { handleStartGame } from "./sockets/gameHandlers";
+import {
+  handleCheckCard,
+  handleSetCard,
+  handleStartGame,
+  handleSwapCard,
+} from "./sockets/gameHandlers";
 
 const app = express();
 const server = createServer(app);
@@ -36,7 +41,7 @@ export const activeGames: Map<string, Game> = new Map();
 io.on("connection", (socket) => {
   console.log(`${socket.id} connected`);
 
-  // Create Room
+  // ROOM HANDLERS
   socket.on(ServerAction.CreateRoom, (payload: LoginRequest, callback) => {
     try {
       handleCreateRoom(socket, payload);
@@ -46,8 +51,6 @@ io.on("connection", (socket) => {
       callback(false);
     }
   });
-
-  // Join Room
   socket.on(ServerAction.JoinRoom, (payload: LoginRequest, callback) => {
     try {
       handleJoinRoom(socket, payload);
@@ -60,13 +63,24 @@ io.on("connection", (socket) => {
   socket.on(ServerAction.ChatMessage, (payload: ChatMessage) =>
     handleChatMessage(payload),
   );
+
+  // LOBBY HANDLERS
   socket.on(ServerAction.SyncLobby, () => handleSyncLobby(socket));
   socket.on(ServerAction.UpdateLobby, (payload: Lobby) =>
     handleUpdateLobby(socket, payload),
   );
+
+  // GAME HANDLERS
   socket.on(ServerAction.StartGame, (payload: Lobby) =>
     handleStartGame(socket, payload),
   );
+  socket.on(ServerAction.SetCard, () => handleSetCard(socket));
+  socket.on(ServerAction.CheckCard, () => handleCheckCard(socket));
+  socket.on(ServerAction.SwapCard, (target: string) =>
+    handleSwapCard(socket, target),
+  );
+  // TODO: condense all swap actions into one or two functions.
+
   // Handle Disconnect with IO and Socket
   socket.on("disconnecting", (_: DisconnectReason) => {
     if (socket.rooms.size > 1) {

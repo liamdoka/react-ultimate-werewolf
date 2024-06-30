@@ -7,6 +7,8 @@ export enum ServerAction {
   UpdateLobby = "UpdateLobby",
   StartGame = "StartGame",
   SetCard = "SetCard",
+  CheckCard = "CheckCard",
+  SwapCard = "SwapCard",
 }
 
 export enum GameState {
@@ -26,6 +28,11 @@ export enum ClientAction {
 export enum LobbyAction {
   UpdateIsReady,
   SyncLobby,
+}
+
+export enum GameAction {
+  SetCard,
+  CheckCard,
 }
 
 export enum CardType {
@@ -68,9 +75,10 @@ export interface Lobby {
 
 export interface Game {
   // socketID => CardType
-  playerCards: Map<string, CardType>;
+  startCards: Map<string, CardType>;
+  endCards: Map<string, CardType>;
+  riverCards: CardType[];
   // Game State Probably
-  // other stuff
 }
 
 export interface Player {

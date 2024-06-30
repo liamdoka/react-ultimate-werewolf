@@ -4,13 +4,13 @@ import { allCards, defaultDeck } from "../../lib/allCards";
 import {
   CardDetails,
   CardType,
+  GameAction,
   GameState,
   ServerAction,
 } from "../../lib/types";
 import { useClient } from "../../context/clientContext";
 import { easeOut, motion, useTime, useTransform } from "framer-motion";
 import {
-  GameAction,
   GamePayload,
   useGameDispatch,
   useGamePlayer,
@@ -38,16 +38,28 @@ export default function Dealer() {
 
   useEffect(() => {
     client.socket?.on(ServerAction.SetCard, handleSetCard);
-    function handleSetCard(payload: CardType) {
-      console.log("doing osmething");
+    client.socket?.on(ServerAction.CheckCard, handleCheckCard);
 
+    function handleSetCard(payload: CardType) {
       gameDispatch({
         action: GameAction.SetCard,
         payload: payload,
       } as GamePayload);
     }
 
-    () => client.socket?.off(ServerAction.SetCard, handleSetCard);
+    function handleCheckCard(payload: CardType) {
+      gameDispatch({
+        action: GameAction.CheckCard,
+        payload: payload,
+      } as GamePayload);
+    }
+
+    client.socket?.emit(ServerAction.SetCard);
+
+    () => {
+      client.socket?.off(ServerAction.SetCard, handleSetCard);
+      client.socket?.off(ServerAction.CheckCard, handleCheckCard);
+    };
   }, [client.socket]);
 
   return (
