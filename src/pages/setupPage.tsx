@@ -10,15 +10,15 @@ import {
   useLobbyDispatch,
 } from "../context/lobbyContext";
 import { useClient } from "../context/clientContext";
-import { COUNTDOWN_TIME } from "../lib/constants";
-import { useInterval, useMediaQuery } from "../lib/utils";
+import { COUNTDOWN_TIME, useDesktop } from "../lib/constants";
+import { useInterval } from "../lib/utils";
 
 export default function SetupPage() {
   const [timeToStart, setTimeToStart] = useState<number>(COUNTDOWN_TIME);
   const [isStarting, setIsStarting] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useDesktop();
 
   const lobby = useLobby();
   const lobbyDispatch = useLobbyDispatch();

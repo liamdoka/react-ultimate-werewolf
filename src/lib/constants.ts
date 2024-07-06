@@ -1,5 +1,6 @@
 import { GamePlayer } from "../context/gameContext";
 import { CardType, LobbyState, Lobby } from "./types";
+import { useMediaQuery } from "./utils";
 
 export const DISCUSSION_TIME_STEP_SIZE = 15;
 export const MIN_DISCUSSION_TIME = 15;
@@ -25,3 +26,5 @@ export const defaultGamePlayer: GamePlayer = {
   initialCard: CardType.Empty,
   endCard: CardType.Empty,
 };
+
+export const useDesktop = () => useMediaQuery("(min-wdith: 768px)");

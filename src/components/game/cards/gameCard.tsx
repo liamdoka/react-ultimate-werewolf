@@ -50,7 +50,7 @@ export default function GameCard(props: {
         y: props.y,
       }}
     >
-      <div className="w-24 overflow-clip rounded-sm">
+      <div className="w-16 overflow-clip rounded-sm md:w-24">
         <img
           className="bg-cover"
           draggable={false}
@@ -58,7 +58,9 @@ export default function GameCard(props: {
           alt={cardDetails.name}
         />
       </div>
-      <p className="text-center font-bold">{cardDetails.name}</p>
+      <p className="text-center text-xs font-bold md:text-base">
+        {cardDetails.name}
+      </p>
     </motion.div>
   );
 }

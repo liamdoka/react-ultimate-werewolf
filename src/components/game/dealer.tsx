@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import {
   CARD_ROTATION_DURATION,
   CARD_ROTATION_FACTOR,
+  useDesktop,
 } from "../../lib/constants";
 import { useTimeout } from "../../lib/utils";
 import PlayerCard from "./cards/playerCard";
@@ -17,6 +18,7 @@ export default function Dealer() {
   const [tempCardVisible, setTempCardVisible] = useState<boolean>(false);
   const [PlayerCardVisible, setPlayerCardVisible] = useState<boolean>(false);
   const controls = useAnimation();
+  const isDesktop = useDesktop();
 
   const lobby = useLobby();
   const client = useClient();
@@ -24,7 +26,7 @@ export default function Dealer() {
   const gameDispatch = useGameDispatch();
 
   const deckSize = lobby.deck.length;
-  const radius = 25 * (deckSize ?? 5);
+  const radius = isDesktop ? 25 * (deckSize ?? 5) : 15 * (deckSize ?? 5);
 
   useEffect(() => {
     const sequence = async () => {
@@ -34,7 +36,7 @@ export default function Dealer() {
       });
       // prettier-ignore
       controls.start({
-        scale: 1.001,
+        scale: 1.0001,
         transition: { duration: 0.5 },
       })
       .then(() => {
@@ -125,7 +127,7 @@ function TempCard() {
         },
       }}
     >
-      <div className="w-24 overflow-clip rounded-sm">
+      <div className="w-16 overflow-clip rounded-sm md:w-24">
         <img
           className="bg-cover"
           draggable={false}

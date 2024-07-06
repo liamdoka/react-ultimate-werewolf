@@ -24,7 +24,7 @@ export default function SetupCard(props: {
           alt={cardDetails.name}
         />
       </div>
-      <p className="text-center text-xs font-bold md:text-sm">
+      <p className="text-center text-xs font-bold md:text-base">
         {cardDetails.name}
       </p>
     </div>
