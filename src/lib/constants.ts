@@ -1,5 +1,5 @@
 import { GamePlayer } from "../context/gameContext";
-import { CardType, GameState, Lobby } from "./types";
+import { CardType, LobbyState, Lobby } from "./types";
 
 export const DISCUSSION_TIME_STEP_SIZE = 15;
 export const MIN_DISCUSSION_TIME = 15;
@@ -17,7 +17,7 @@ export const defaultRoom: Lobby = {
   players: [],
   deck: [0],
   admin: "",
-  state: GameState.Waiting,
+  state: LobbyState.Waiting,
   discussionTime: DEFAULT_DISCUSSION_TIME,
 };
 

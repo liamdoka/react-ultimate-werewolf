@@ -1,7 +1,7 @@
 import Dealer from "../components/game/dealer";
 import { GameProvider } from "../context/gameContext";
 import { useLobby } from "../context/lobbyContext";
-import { GameState } from "../lib/types";
+import { LobbyState } from "../lib/types";
 import SetupPage from "./setupPage";
 
 export default function GamePage() {
@@ -11,7 +11,7 @@ export default function GamePage() {
   // prettier-ignore
   return (
     <>
-      {lobby.state === GameState.Running ? (
+      {lobby.state === LobbyState.Running ? (
         <GameProvider>
           <Dealer />
         </GameProvider>

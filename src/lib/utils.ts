@@ -15,7 +15,7 @@ export const getRoomCode = (socket: Socket) => {
 };
 
 export function copyOf<T>(object: T): T {
-  return JSON.parse(JSON.stringify(object));
+  return JSON.parse(JSON.stringify(object)) as T;
 }
 
 export function shuffled<T>(array: T[]): T[] {
@@ -64,7 +64,7 @@ export function createPlayerTurns(cards: Map<string, number>): string[][] {
     cardSet.get(CardType.Engineer) ?? [],
     cardSet.get(CardType.Demoman) ?? [],
     cardSet.get(CardType.Medic) ?? [],
-  )
+  ).filter((arr) => arr.length > 0)
 
   return turns;
 }

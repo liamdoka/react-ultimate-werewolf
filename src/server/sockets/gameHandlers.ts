@@ -1,5 +1,11 @@
 import { Socket } from "socket.io";
-import { CardType, Game, Lobby, ServerAction } from "../../lib/types";
+import {
+  CardType,
+  Game,
+  GameState,
+  Lobby,
+  ServerAction,
+} from "../../lib/types";
 import { createPlayerTurns, getRoomCode, shuffled } from "../../lib/utils";
 import { handleUpdateLobby } from "./lobbyHandlers";
 import { activeGames, activeRooms } from "../server";
@@ -22,7 +28,7 @@ export const dealCards = (socket: Socket, payload: Lobby) => {
 
   // shuffle all except the first card
   const shuffledPlayers = shuffled(players);
-  const shuffledCards = shuffled(actualCards.slice(1, players.length));
+  const shuffledCards = shuffled(actualCards.slice(1, actualCards.length));
   shuffledCards.unshift(CardType.BluSpy);
 
   const playerCards: Map<string, CardType> = new Map();
@@ -46,6 +52,7 @@ export const dealCards = (socket: Socket, payload: Lobby) => {
     endCards: new Map<string, CardType>(),
     riverCards: riverCards,
     turns: playerTurns,
+    state: GameState.Dealing,
   };
 
   activeGames.set(roomCode, newGame);

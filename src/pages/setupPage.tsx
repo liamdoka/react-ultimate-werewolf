@@ -3,7 +3,7 @@ import RoomCode from "../components/roomCode/roomCode";
 import LobbyMenu from "../components/lobby/lobby";
 import Setup from "../components/setup/setup";
 import { useEffect, useState } from "react";
-import { GameState, Lobby, LobbyAction, ServerAction } from "../lib/types";
+import { LobbyState, Lobby, LobbyAction, ServerAction } from "../lib/types";
 import {
   LobbyPayload,
   useLobby,
@@ -52,9 +52,9 @@ export default function GamePage() {
     setIsAdmin(client.socket?.id == lobby?.admin);
   }, [lobby, client]);
 
-  // start countdown timer on gamestate change
+  // start countdown timer on LobbyState change
   useEffect(() => {
-    if (isStarting === false && lobby.state === GameState.Starting) {
+    if (isStarting === false && lobby.state === LobbyState.Starting) {
       setIsStarting(true);
     } else {
       setIsStarting(false);
@@ -90,10 +90,10 @@ export default function GamePage() {
       initiateCountdown(_lobby);
     } else {
       // if the players are no longer ready, change the state
-      if (_lobby.state === GameState.Starting) {
+      if (_lobby.state === LobbyState.Starting) {
         const newLobby: Lobby = {
           ..._lobby,
-          state: GameState.Waiting,
+          state: LobbyState.Waiting,
         };
         client.socket?.emit(ServerAction.UpdateLobby, newLobby);
       }
@@ -101,23 +101,23 @@ export default function GamePage() {
   };
 
   const initiateCountdown = (_lobby: Lobby) => {
-    if (_lobby.state !== GameState.Waiting) return;
+    if (_lobby.state !== LobbyState.Waiting) return;
     // if (_lobby.players.length < 2) return;
 
     const newLobby: Lobby = {
       ..._lobby,
-      state: GameState.Starting,
+      state: LobbyState.Starting,
     };
 
     client.socket?.emit(ServerAction.UpdateLobby, newLobby);
   };
 
   const handleStartGame = () => {
-    if (lobby?.state !== GameState.Starting) throw TypeError();
+    if (lobby?.state !== LobbyState.Starting) throw TypeError();
 
     const newLobby: Lobby = {
       ...lobby,
-      state: GameState.Running,
+      state: LobbyState.Running,
     };
 
     client.socket?.emit(ServerAction.StartGame, newLobby);

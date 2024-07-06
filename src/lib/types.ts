@@ -9,12 +9,21 @@ export enum ServerAction {
   SetCard = "SetCard",
   CheckCard = "CheckCard",
   SwapCard = "SwapCard",
+  CheckRiver = "CheckRiver",
 }
 
-export enum GameState {
+export enum LobbyState {
   Waiting,
   Starting,
   Running,
+  Ended,
+}
+
+export enum GameState {
+  Dealing,
+  Playing,
+  Discussing,
+  Voting,
   Ended,
 }
 
@@ -33,6 +42,7 @@ export enum LobbyAction {
 export enum GameAction {
   SetCard,
   CheckCard,
+  CheckRiver,
 }
 
 export enum CardType {
@@ -56,10 +66,6 @@ export interface CardDetails {
   utility: string;
 }
 
-export interface StatusCallback {
-  status: "failure" | "success";
-}
-
 export interface LoginRequest {
   roomCode: string;
   nickname: string;
@@ -69,7 +75,7 @@ export interface Lobby {
   players: Player[];
   deck: CardType[];
   admin: string;
-  state: GameState;
+  state: LobbyState;
   discussionTime: number;
 }
 
@@ -79,7 +85,7 @@ export interface Game {
   endCards: Map<string, CardType>;
   riverCards: CardType[];
   turns: string[][];
-  // Game State Probably
+  state: GameState;
 }
 
 export interface Player {
