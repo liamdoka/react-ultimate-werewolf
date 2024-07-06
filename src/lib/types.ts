@@ -78,6 +78,7 @@ export interface Game {
   startCards: Map<string, CardType>;
   endCards: Map<string, CardType>;
   riverCards: CardType[];
+  turns: string[][];
   // Game State Probably
 }
 

@@ -1,6 +1,7 @@
 import { customAlphabet } from "nanoid";
 import { useEffect, useRef } from "react";
 import { Socket } from "socket.io";
+import { CardType } from "./types";
 
 const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const nanoid = customAlphabet(alphabet, 6);
@@ -35,6 +36,37 @@ export function shuffled<T>(array: T[]): T[] {
   }
 
   return newArray;
+}
+
+export function createPlayerTurns(cards: Map<string, number>): string[][] {
+  const cardSet = new Map<number, string[]>();
+
+  for (const [id, type] of cards.entries()) {
+    const entries = cardSet.get(type);
+
+    if (entries == null) {
+      const newArray = [id];
+      cardSet.set(type, newArray);
+    } else {
+      entries.push(id);
+      cardSet.set(type, entries);
+    }
+  }
+  const turns: string[][] = [];
+  const bluSpy = cardSet.get(CardType.BluSpy) ?? [];
+
+  // prettier-ignore
+  turns.concat(
+    cardSet.get(CardType.Spy) ?? [],
+    bluSpy.length > 1 ? [] : bluSpy,
+    cardSet.get(CardType.Scout) ?? [],
+    cardSet.get(CardType.Pyro) ?? [],
+    cardSet.get(CardType.Engineer) ?? [],
+    cardSet.get(CardType.Demoman) ?? [],
+    cardSet.get(CardType.Medic) ?? [],
+  )
+
+  return turns;
 }
 
 export function useInterval(callback: () => void, delay: number | null) {

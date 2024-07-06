@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { CardType, Game, Lobby, ServerAction } from "../../lib/types";
-import { getRoomCode, shuffled } from "../../lib/utils";
+import { createPlayerTurns, getRoomCode, shuffled } from "../../lib/utils";
 import { handleUpdateLobby } from "./lobbyHandlers";
 import { activeGames, activeRooms } from "../server";
 import { defaultDeck } from "../../lib/allCards";
@@ -26,17 +26,26 @@ export const dealCards = (socket: Socket, payload: Lobby) => {
   shuffledCards.unshift(CardType.BluSpy);
 
   const playerCards: Map<string, CardType> = new Map();
+  const riverCards = [];
 
-  for (let i = 0; i < shuffledPlayers.length; i++) {
-    const player = shuffledPlayers[i];
+  for (let i = 0; i < shuffledCards.length; i++) {
     const card = shuffledCards[i];
-    playerCards.set(player.socketId, card);
+
+    if (i < shuffledPlayers.length) {
+      const player = shuffledPlayers[i];
+      playerCards.set(player.socketId, card);
+    } else {
+      riverCards.push(card);
+    }
   }
+
+  const playerTurns = createPlayerTurns(playerCards);
 
   const newGame: Game = {
     startCards: playerCards,
     endCards: new Map<string, CardType>(),
-    riverCards: [],
+    riverCards: riverCards,
+    turns: playerTurns,
   };
 
   activeGames.set(roomCode, newGame);

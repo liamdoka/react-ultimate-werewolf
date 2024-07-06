@@ -7,13 +7,20 @@ import {
   ServerAction,
 } from "../../lib/types";
 import { useClient } from "../../context/clientContext";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useAnimation,
+  useMotionTemplate,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import {
   GamePayload,
   useGameDispatch,
   useGamePlayer,
 } from "../../context/gameContext";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import {
   CARD_ROTATION_DURATION,
   CARD_ROTATION_FACTOR,
@@ -69,9 +76,9 @@ export default function Dealer() {
   }, [client.socket]);
 
   return (
-    <div className="relative grid place-items-center">
+    <div className="relative grid h-full w-full place-items-center">
       <motion.div
-        className="relative grid h-[640px] w-[640px] place-items-center overflow-hidden"
+        className="absolute grid h-full max-h-[640px] w-full max-w-[640px] place-items-center overflow-hidden"
         animate={controls}
       >
         <AnimatePresence>
@@ -105,38 +112,55 @@ export default function Dealer() {
   );
 }
 
+const ROTATION_RANGE = 32.5;
+const HALF_ROTATION_RANGE = 32.5 / 2;
+
 function PlayerCard() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const xSpring = useSpring(x);
+  const ySpring = useSpring(y);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+
+    const width = rect.width;
+    const height = rect.height;
+
+    const mouseX = (e.clientX - rect.left) * ROTATION_RANGE;
+    const mouseY = (e.clientY - rect.top) * ROTATION_RANGE;
+
+    const rX = (mouseY / height - HALF_ROTATION_RANGE) * -1;
+    const rY = mouseX / width - HALF_ROTATION_RANGE;
+
+    x.set(rX);
+    y.set(rY);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const transform = useMotionTemplate`rotateX(${xSpring}deg) rotateY(${ySpring}deg)`;
+
   const player = useGamePlayer();
   const cardDetails = allCards[player.initialCard];
-  const controls = useAnimation();
-
-  useEffect(() => {
-    const sequence = async () => {
-      await controls.start({
-        transition: {
-          delay: 0.8,
-        },
-      });
-      controls.start({
-        opacity: 1,
-        transition: { duration: 0.5 },
-      });
-      controls.start({
-        y: [800, 200],
-        transition: {
-          duration: 1.2,
-          ease: "easeOut",
-        },
-      });
-    };
-
-    sequence();
-  }, [controls]);
 
   return (
     <motion.div
-      className="absolute flex max-w-72 cursor-pointer select-none flex-col items-stretch rounded-2xl border-2 border-transparent bg-slate-700 p-2 opacity-0 shadow-lg hover:border-slate-50"
-      animate={controls}
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="absolute flex w-full max-w-72 cursor-pointer select-none flex-col items-stretch rounded-2xl border-2 border-transparent bg-slate-700 p-2 shadow-lg hover:border-slate-50"
+      style={{
+        transform,
+        transformStyle: "preserve-3d",
+      }}
     >
       <img
         src={`/cards/${cardDetails.img}`}
