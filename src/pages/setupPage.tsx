@@ -11,12 +11,14 @@ import {
 } from "../context/lobbyContext";
 import { useClient } from "../context/clientContext";
 import { COUNTDOWN_TIME } from "../lib/constants";
-import { useInterval } from "../lib/utils";
+import { useInterval, useMediaQuery } from "../lib/utils";
 
-export default function GamePage() {
+export default function SetupPage() {
   const [timeToStart, setTimeToStart] = useState<number>(COUNTDOWN_TIME);
   const [isStarting, setIsStarting] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const lobby = useLobby();
   const lobbyDispatch = useLobbyDispatch();
@@ -126,14 +128,24 @@ export default function GamePage() {
   return (
     <>
       {lobby && (
-        <div className="flex flex-row gap-4">
-          <div className="flex flex-col items-center gap-4">
-            <RoomCode code={client.roomCode} />
-            <LobbyMenu />
-          </div>
+        <div className="flex flex-col items-center gap-4 p-4 md:flex-row">
+          {isDesktop ? (
+            <>
+              <div className="flex flex-col items-center gap-4">
+                <RoomCode code={client.roomCode} />
+                <LobbyMenu />
+              </div>
 
-          <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
-          <Chatbox />
+              <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
+              <Chatbox />
+            </>
+          ) : (
+            <>
+              <RoomCode code={client.roomCode} />
+              <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
+              <LobbyMenu />
+            </>
+          )}
         </div>
       )}
     </>

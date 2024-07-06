@@ -16,7 +16,7 @@ export default function SetupCard(props: {
       onMouseDown={() => props.toggleEnabled()}
       className={`flex select-none flex-col gap-1 rounded-md bg-slate-700 p-1 shadow-md ${isDisabled} ${isSelectable} transition-opacity`}
     >
-      <div className="w-24 overflow-clip rounded-sm">
+      <div className="w-16 overflow-clip rounded-md md:w-24 md:rounded-sm">
         <img
           className="bg-cover"
           draggable={false}
@@ -24,7 +24,9 @@ export default function SetupCard(props: {
           alt={cardDetails.name}
         />
       </div>
-      <p className="text-center font-bold">{cardDetails.name}</p>
+      <p className="text-center text-xs font-bold md:text-sm">
+        {cardDetails.name}
+      </p>
     </div>
   );
 }

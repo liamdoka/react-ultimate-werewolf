@@ -94,7 +94,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-w-96 flex-col items-center justify-between gap-8 rounded-lg bg-slate-700 p-8 shadow-xl">
+    <div className="flex flex-col items-center justify-between gap-8 rounded-lg bg-slate-700 px-8 py-4 shadow-xl md:min-w-96 md:py-8">
       <p className=" text-center font-bold">JOIN A ROOM</p>
       <div className="flex flex-grow flex-col flex-nowrap gap-4">
         {/* user nickname */}

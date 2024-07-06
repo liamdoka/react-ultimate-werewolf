@@ -98,8 +98,8 @@ export default function Setup(props: {
   };
 
   return (
-    <div className="flex w-[680px] flex-grow flex-col items-stretch gap-2 rounded-lg bg-slate-700 p-2 shadow-xl">
-      <div className="width-full flex flex-row flex-nowrap items-center justify-between px-2">
+    <div className="flex w-full min-w-96 max-w-screen-sm  flex-grow flex-col items-stretch gap-2 rounded-lg bg-slate-700 p-2 shadow-xl">
+      <div className="flex w-full flex-row flex-nowrap items-center justify-between px-2">
         <div className="select-none opacity-0">
           {numCards} / {totalCards} cards
         </div>
@@ -119,7 +119,7 @@ export default function Setup(props: {
           />
         ))}
       </div>
-      <div className="flex flex-row flex-nowrap items-center justify-between gap-2">
+      <div className="flex flex-row flex-nowrap items-stretch justify-between gap-2">
         <div className="flex basis-full flex-row flex-nowrap items-center justify-center gap-2 rounded-md bg-slate-800 p-2">
           <div>Discussion time:</div>
           <div className="flex flex-row flex-nowrap items-stretch justify-center gap-1">
@@ -156,13 +156,13 @@ export default function Setup(props: {
         </div>
         {isLobbyReady ? (
           <div
-            className={`basis-full cursor-pointer rounded-md ${isReady ? "bg-emerald-800" : "bg-slate-800"} p-2 text-center font-bold`}
+            className={`flex basis-full cursor-pointer items-center justify-center rounded-md ${isReady ? "bg-emerald-800" : "bg-slate-800"} p-2 text-center font-bold`}
             onClick={toggleReady}
           >
             {props.timeToStart === COUNTDOWN_TIME ? "Ready" : props.timeToStart}
           </div>
         ) : (
-          <div className="basis-full rounded-md p-2 text-center">
+          <div className="flex basis-full items-center justify-center p-2 text-center">
             Waiting...
           </div>
         )}
