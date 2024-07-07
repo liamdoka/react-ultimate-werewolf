@@ -1,4 +1,9 @@
-import { createContext, useContext, useReducer } from "react";
+import React, {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useReducer,
+} from "react";
 import { Lobby, LobbyAction } from "../lib/types";
 import { copyOf } from "../lib/utils";
 import { defaultRoom } from "../lib/constants";
@@ -15,13 +20,13 @@ const LobbyDispatchContext = createContext<React.Dispatch<LobbyPayload>>(
   () => {},
 );
 
-export function LobbyProvider({ children }: any) {
+export function LobbyProvider(props: PropsWithChildren) {
   const [lobby, dispatch] = useReducer(lobbyReducer, copyOf(defaultRoom));
 
   return (
     <LobbyContext.Provider value={lobby}>
       <LobbyDispatchContext.Provider value={dispatch}>
-        {children}
+        {props.children}
       </LobbyDispatchContext.Provider>
     </LobbyContext.Provider>
   );

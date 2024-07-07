@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
 // import { socket } from "../socket";
 import { clientReducer } from "./reducers/clientReducer";
 import { ClientAction } from "../lib/types";
@@ -22,9 +28,11 @@ const initialClient: Client = {
 };
 
 const ClientContext = createContext<Client>(initialClient);
-const ClientDispatchContext = createContext<React.Dispatch<any>>(() => {});
+const ClientDispatchContext = createContext<React.Dispatch<ClientPayload>>(
+  () => {},
+);
 
-export function ClientProvider({ children }: any) {
+export function ClientProvider(props: PropsWithChildren) {
   const [client, dispatch] = useReducer(clientReducer, initialClient);
 
   useEffect(() => {
@@ -43,7 +51,7 @@ export function ClientProvider({ children }: any) {
   return (
     <ClientContext.Provider value={client}>
       <ClientDispatchContext.Provider value={dispatch}>
-        {children}
+        {props.children}
       </ClientDispatchContext.Provider>
     </ClientContext.Provider>
   );

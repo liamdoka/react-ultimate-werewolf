@@ -10,13 +10,13 @@ import {
   CARD_ROTATION_FACTOR,
   useDesktop,
 } from "../../lib/constants";
-import { useTimeout } from "../../lib/utils";
+import { useTimeout } from "../../lib/hooks";
 import PlayerCard from "./cards/playerCard";
 import GameCard from "./cards/gameCard";
 
 export default function Dealer() {
   const [tempCardVisible, setTempCardVisible] = useState<boolean>(false);
-  const [PlayerCardVisible, setPlayerCardVisible] = useState<boolean>(false);
+  const [playerCardVisible, setPlayerCardVisible] = useState<boolean>(false);
   const controls = useAnimation();
   const isDesktop = useDesktop();
 
@@ -35,7 +35,7 @@ export default function Dealer() {
         transition: { duration: CARD_ROTATION_DURATION },
       });
       // prettier-ignore
-      controls.start({
+      controls.start({ // doing this just for the timeout please come back and fix
         scale: 1.0001,
         transition: { duration: 0.5 },
       })
@@ -107,7 +107,7 @@ export default function Dealer() {
       <div className="absolute grid h-full w-full place-items-center items-center overflow-hidden">
         <AnimatePresence>
           {tempCardVisible && <TempCard />}
-          {PlayerCardVisible && <PlayerCard />}
+          {playerCardVisible && <PlayerCard />}
         </AnimatePresence>
       </div>
     </div>

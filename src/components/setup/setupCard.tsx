@@ -4,7 +4,7 @@ import { CardDetails, CardType } from "../../lib/types";
 export default function SetupCard(props: {
   cardType: CardType;
   enabled?: boolean;
-  toggleEnabled: Function;
+  toggleEnabled: () => void;
   selectable?: boolean;
 }) {
   const cardDetails: CardDetails = allCards[props.cardType];

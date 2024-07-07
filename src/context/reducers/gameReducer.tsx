@@ -1,5 +1,5 @@
 import { allCards } from "../../lib/allCards";
-import { CardDetails, CardType, GameAction } from "../../lib/types";
+import { CardType, GameAction } from "../../lib/types";
 import { GamePayload, GamePlayer } from "../gameContext";
 
 export function gameReducer(state: GamePlayer, payload: GamePayload) {

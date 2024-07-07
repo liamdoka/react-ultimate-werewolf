@@ -1,4 +1,9 @@
-import { createContext, useContext, useReducer } from "react";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useReducer,
+} from "react";
 import { CardType, GameAction } from "../lib/types";
 import { copyOf } from "../lib/utils";
 import { defaultGamePlayer } from "../lib/constants";
@@ -19,7 +24,7 @@ const GameDispatchContext = createContext<React.Dispatch<GamePayload>>(
   () => {},
 );
 
-export function GameProvider({ children }: any) {
+export function GameProvider(props: PropsWithChildren) {
   const [gamePlayer, dispatch] = useReducer(
     gameReducer,
     copyOf(defaultGamePlayer),
@@ -28,7 +33,7 @@ export function GameProvider({ children }: any) {
   return (
     <GameContext.Provider value={gamePlayer}>
       <GameDispatchContext.Provider value={dispatch}>
-        {children}
+        {props.children}
       </GameDispatchContext.Provider>
     </GameContext.Provider>
   );

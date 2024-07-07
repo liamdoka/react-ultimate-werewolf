@@ -32,8 +32,8 @@ export default function Chatbox() {
     }
   };
 
-  const handleKeyDown = (e: any) => {
-    if (e?.key === "Enter") {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
       handleSend();
     }
   };

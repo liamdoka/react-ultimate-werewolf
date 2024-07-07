@@ -1,5 +1,4 @@
 import { customAlphabet } from "nanoid";
-import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io";
 import { CardType } from "./types";
 
@@ -25,7 +24,7 @@ export function shuffled<T>(array: T[]): T[] {
   // While there remain elements to shuffle...
   while (currentIndex != 0) {
     // Pick a remaining element...
-    let randomIndex = Math.floor(Math.random() * currentIndex);
+    const randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
 
     // And swap it with the current element.
@@ -68,60 +67,3 @@ export function createPlayerTurns(cards: Map<string, number>): string[][] {
 
   return turns;
 }
-
-export function useInterval(callback: () => void, delay: number | null) {
-  const savedCallback = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  });
-
-  useEffect(() => {
-    function tick() {
-      if (savedCallback.current !== null) {
-        savedCallback.current();
-      }
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}
-
-export function useTimeout(callback: () => void, delay: number | null): void {
-  const savedCallback = useRef(callback);
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    if (!delay && delay !== 0) {
-      return;
-    }
-    const id = setTimeout(() => {
-      savedCallback.current();
-    }, delay);
-
-    return () => {
-      clearTimeout(id);
-    };
-  }, [delay]);
-}
-
-export const useMediaQuery = (query: string) => {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
-    const listener = () => setMatches(media.matches);
-    window.addEventListener("resize", listener);
-    return () => window.removeEventListener("resize", listener);
-  }, [matches, query]);
-
-  return matches;
-};

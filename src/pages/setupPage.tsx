@@ -62,7 +62,7 @@ export default function SetupPage() {
       setIsStarting(false);
       setTimeToStart(COUNTDOWN_TIME);
     }
-  }, [lobby]);
+  }, [lobby, isStarting]);
 
   useInterval(
     () => {

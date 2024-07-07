@@ -1,13 +1,7 @@
 import { Socket } from "socket.io";
 import { copyOf, getRoomCode } from "../../lib/utils";
 import { activeGames } from "../server";
-import {
-  CardType,
-  Game,
-  GameAction,
-  GameState,
-  ServerAction,
-} from "../../lib/types";
+import { CardType, Game, GameState, ServerAction } from "../../lib/types";
 
 const runGame = (socket: Socket) => {
   const roomCode = getRoomCode(socket);
@@ -51,10 +45,10 @@ const handleGamePlaying = (socket: Socket, roomCode: string, game: Game) => {
   runGame(socket);
 };
 
-function handlePlayerTurn(socket: Socket, game, currentTurn: string[]) {
+function handlePlayerTurn(socket: Socket, game: Game, currentTurn: string[]) {
   const playerOne = currentTurn[0];
   const cardType =
-    game.endCard.get(playerOne) ?? game.startCards.get(playerOne);
+    game.endCards.get(playerOne) ?? game.startCards.get(playerOne);
 
   switch (cardType) {
     case CardType.BluSpy:
