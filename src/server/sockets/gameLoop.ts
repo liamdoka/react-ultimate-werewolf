@@ -1,7 +1,16 @@
 import { Socket } from "socket.io";
 import { copyOf, getRoomCode } from "../../lib/utils";
-import { activeGames } from "../server";
-import { CardType, Game, GameState, ServerAction } from "../../lib/types";
+import { activeGames, io } from "../server";
+import {
+  CardDetails,
+  CardType,
+  Game,
+  GameAction,
+  GameState,
+  ServerAction,
+} from "../../lib/types";
+import { Card } from "@mui/material";
+import { allCards } from "../../lib/allCards";
 
 const runGame = (socket: Socket) => {
   const roomCode = getRoomCode(socket);
@@ -32,7 +41,7 @@ const handleGamePlaying = (socket: Socket, roomCode: string, game: Game) => {
     const currentTurn = turnsRemaining.shift() ?? [];
 
     if (currentTurn.length > 0) {
-      handlePlayerTurn(socket, game, currentTurn);
+      handlePlayerTurn(game, currentTurn);
     }
 
     const newGame: Game = {
@@ -45,16 +54,16 @@ const handleGamePlaying = (socket: Socket, roomCode: string, game: Game) => {
   runGame(socket);
 };
 
-function handlePlayerTurn(socket: Socket, game: Game, currentTurn: string[]) {
+function handlePlayerTurn(game: Game, currentTurn: string[]) {
   const playerOne = currentTurn[0];
-  const cardType =
-    game.endCards.get(playerOne) ?? game.startCards.get(playerOne);
 
-  switch (cardType) {
-    case CardType.BluSpy:
-      socket.to(currentTurn).emit(ServerAction.CheckRiver);
-      return;
-    default:
-      throw new Error("Function not implemented.");
+  const cardType: CardType | undefined =
+    game.endCards.get(playerOne) ?? game.startCards.get(playerOne);
+  if (cardType == null) throw Error(`CardType: ${cardType} not found`);
+
+  const card: CardDetails = allCards[cardType];
+
+  if (card.action != null) {
+    io.to(currentTurn).emit(card.action);
   }
 }

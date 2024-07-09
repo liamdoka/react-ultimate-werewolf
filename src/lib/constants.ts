@@ -1,5 +1,4 @@
 import { GamePlayer } from "../context/gameContext";
-import { useMediaQuery } from "./hooks";
 import { CardType, LobbyState, Lobby } from "./types";
 
 export const DISCUSSION_TIME_STEP_SIZE = 15;

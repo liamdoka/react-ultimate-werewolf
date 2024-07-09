@@ -1,4 +1,4 @@
-import { CardDetails, CardType } from "./types";
+import { CardDetails, CardType, GameAction } from "./types";
 
 export const allCards: Record<CardType, CardDetails> = {
   [CardType.Empty]: {
@@ -13,6 +13,7 @@ export const allCards: Record<CardType, CardDetails> = {
     details: "",
     utility:
       "If there is only one BLU SPY, look at a card from the middle.\nIf there are two, do nothing.",
+    action: GameAction.CheckRiverSingle,
   },
   [CardType.Demoman]: {
     name: "Demoman",
@@ -25,6 +26,7 @@ export const allCards: Record<CardType, CardDetails> = {
     img: "engineer.png",
     details: "",
     utility: "",
+    action: GameAction.SwapWithPlayer,
   },
   [CardType.Heavy]: {
     name: "Heavy",
@@ -37,18 +39,21 @@ export const allCards: Record<CardType, CardDetails> = {
     img: "medic.png",
     details: "",
     utility: "",
+    action: GameAction.CheckCard,
   },
   [CardType.Pyro]: {
     name: "Pyro",
     img: "pyro.png",
     details: "",
     utility: "",
+    action: GameAction.SwapOtherPlayers,
   },
   [CardType.Scout]: {
     name: "Scout",
     img: "scout.png",
     details: "",
     utility: "",
+    action: GameAction.CheckOneOrTwo,
   },
   [CardType.Sniper]: {
     name: "Sniper",
@@ -67,6 +72,7 @@ export const allCards: Record<CardType, CardDetails> = {
     img: "spy.png",
     details: "",
     utility: "",
+    action: GameAction.AssumeForm,
   },
 };
 

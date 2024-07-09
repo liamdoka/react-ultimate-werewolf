@@ -6,10 +6,6 @@ export enum ServerAction {
   SyncLobby = "SyncLobby",
   UpdateLobby = "UpdateLobby",
   StartGame = "StartGame",
-  SetCard = "SetCard",
-  CheckCard = "CheckCard",
-  SwapCard = "SwapCard",
-  CheckRiver = "CheckRiver",
 }
 
 export enum LobbyState {
@@ -40,9 +36,14 @@ export enum LobbyAction {
 }
 
 export enum GameAction {
-  SetCard,
-  CheckCard,
-  CheckRiver,
+  SetCard = "SetCard",
+  CheckCard = "CheckCard",
+  CheckRiverSingle = "CheckRiverSingle",
+  CheckOneOrTwo = "CheckOneOrTwo",
+  SwapWithPlayer = "SwapWithPlayer",
+  SwapWithRiver = "SwapWithRiver",
+  SwapOtherPlayers = "SwapOtherPlayers",
+  AssumeForm = "AssumeForm",
 }
 
 export enum CardType {
@@ -64,6 +65,7 @@ export interface CardDetails {
   img: string;
   details: string;
   utility: string;
+  action?: GameAction;
 }
 
 export interface LoginRequest {

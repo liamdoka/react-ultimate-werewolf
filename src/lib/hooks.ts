@@ -41,7 +41,7 @@ export function useTimeout(callback: () => void, delay: number | null): void {
   }, [delay]);
 }
 
-export const useMediaQuery = (query: string) => {
+export const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
@@ -58,7 +58,5 @@ export const useMediaQuery = (query: string) => {
 };
 
 export const useMobile = () => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  console.log(`isMobile: ${isMobile}`);
-  return isMobile;
+  return useMediaQuery("(max-width: 768px)");
 };
