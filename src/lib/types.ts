@@ -44,6 +44,7 @@ export enum GameAction {
   SwapWithRiver = "SwapWithRiver",
   SwapOtherPlayers = "SwapOtherPlayers",
   AssumeForm = "AssumeForm",
+  EndTurn = "EndTurn",
 }
 
 export enum CardType {
@@ -102,3 +103,6 @@ export interface ChatMessage {
   sender: string;
   iat: number;
 }
+
+export type OptString = string | null;
+export type OptNumber = number | null;

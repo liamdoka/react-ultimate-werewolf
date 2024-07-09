@@ -36,7 +36,7 @@ export default function Setup(props: {
 
   useEffect(() => {
     client.socket?.emit(ServerAction.SyncLobby);
-  }, []);
+  }, [client.socket]);
 
   const toggleCardEnabled = (cardId: number) => {
     if (!props.isAdmin) throw AdminError();

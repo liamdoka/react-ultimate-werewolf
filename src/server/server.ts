@@ -4,8 +4,11 @@ import express from "express";
 import {
   ChatMessage,
   Game,
+  GameAction,
   Lobby,
   LoginRequest,
+  OptNumber,
+  OptString,
   Player,
   ServerAction,
 } from "../lib/types";
@@ -21,10 +24,16 @@ import {
 } from "./sockets/lobbyHandlers";
 import { getRoomCode } from "../lib/utils";
 import {
+  handleAssumeForm,
   handleCheckCard,
+  handleCheckOneOrTwo,
+  handleCheckRiverSingle,
+  handleEndTurn,
   handleSetCard,
   handleStartGame,
-  handleSwapCard,
+  handleSwapOtherPlayers,
+  handleSwapWithPlayer,
+  handleSwapWithRiver,
 } from "./sockets/gameHandlers";
 
 const app = express();
@@ -74,12 +83,31 @@ io.on("connection", (socket) => {
   socket.on(ServerAction.StartGame, (payload: Lobby) =>
     handleStartGame(socket, payload),
   );
-  socket.on(ServerAction.SetCard, () => handleSetCard(socket));
-  socket.on(ServerAction.CheckCard, () => handleCheckCard(socket));
-  socket.on(ServerAction.SwapCard, (target: string) =>
-    handleSwapCard(socket, target),
+  socket.on(GameAction.SetCard, () => handleSetCard(socket));
+  socket.on(GameAction.CheckCard, () => handleCheckCard(socket));
+  socket.on(GameAction.CheckRiverSingle, (index: number) =>
+    handleCheckRiverSingle(socket, index),
   );
-  // TODO: condense all swap actions into one or two functions.
+  socket.on(
+    GameAction.CheckOneOrTwo,
+    (target: OptString, riverOne: OptNumber, riverTwo: OptNumber) =>
+      handleCheckOneOrTwo(socket, target, riverOne, riverTwo),
+  );
+  socket.on(GameAction.SwapWithPlayer, (target: string) =>
+    handleSwapWithPlayer(socket, target),
+  );
+  socket.on(GameAction.SwapWithRiver, (index: number) =>
+    handleSwapWithRiver(socket, index),
+  );
+  socket.on(
+    GameAction.SwapOtherPlayers,
+    (targetOne: string, targetTwo: string) =>
+      handleSwapOtherPlayers(socket, targetOne, targetTwo),
+  );
+  socket.on(GameAction.AssumeForm, (target: string) =>
+    handleAssumeForm(socket, target),
+  );
+  socket.on(GameAction.EndTurn, () => handleEndTurn(socket));
 
   // Handle Disconnect with IO and Socket
   socket.on("disconnecting", (_: DisconnectReason) => {

@@ -37,7 +37,7 @@ export default function GameCard(props: {
     };
 
     sequence();
-  }, [controls]);
+  }, [controls, props]);
 
   const cardDetails: CardDetails = allCards[0];
 

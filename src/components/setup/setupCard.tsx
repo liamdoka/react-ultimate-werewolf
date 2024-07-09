@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { allCards } from "../../lib/allCards";
 import { CardDetails, CardType } from "../../lib/types";
-import { Box, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 
 export default function SetupCard(props: {
@@ -16,17 +16,11 @@ export default function SetupCard(props: {
 
   return (
     <div
-      onMouseDown={() => props.toggleEnabled()}
+      onMouseDown={props.toggleEnabled}
       className={`flex select-none flex-col gap-1 rounded-md bg-slate-700 p-1 shadow-md ${isDisabled} ${isSelectable} transition-opacity`}
     >
       <div className="aspect-square w-16 overflow-clip rounded-md md:w-24 md:rounded-sm">
-        <Suspense
-          fallback={
-            <Box className="w-full, h-full">
-              <CircularProgress />
-            </Box>
-          }
-        >
+        <Suspense fallback={<CircularProgress color="inherit" />}>
           <motion.img
             initial={{ opacity: 0 }}
             animate={{

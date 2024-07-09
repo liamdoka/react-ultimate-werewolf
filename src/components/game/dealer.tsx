@@ -44,7 +44,7 @@ export default function Dealer() {
     };
 
     sequence();
-  }, [controls]);
+  }, [controls, deckSize]);
 
   useTimeout(
     () => {
@@ -55,8 +55,8 @@ export default function Dealer() {
   );
 
   useEffect(() => {
-    client.socket?.on(ServerAction.SetCard, handleSetCard);
-    client.socket?.on(ServerAction.CheckCard, handleCheckCard);
+    client.socket?.on(GameAction.SetCard, handleSetCard);
+    client.socket?.on(GameAction.CheckCard, handleCheckCard);
 
     function handleSetCard(payload: CardType) {
       gameDispatch({
@@ -72,11 +72,11 @@ export default function Dealer() {
       } as GamePayload);
     }
 
-    client.socket?.emit(ServerAction.SetCard);
+    client.socket?.emit(GameAction.SetCard);
 
     () => {
-      client.socket?.off(ServerAction.SetCard, handleSetCard);
-      client.socket?.off(ServerAction.CheckCard, handleCheckCard);
+      client.socket?.off(GameAction.SetCard, handleSetCard);
+      client.socket?.off(GameAction.CheckCard, handleCheckCard);
     };
   }, [client.socket]);
 

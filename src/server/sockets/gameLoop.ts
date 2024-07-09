@@ -1,15 +1,7 @@
 import { Socket } from "socket.io";
 import { copyOf, getRoomCode } from "../../lib/utils";
 import { activeGames, io } from "../server";
-import {
-  CardDetails,
-  CardType,
-  Game,
-  GameAction,
-  GameState,
-  ServerAction,
-} from "../../lib/types";
-import { Card } from "@mui/material";
+import { CardDetails, CardType, Game, GameState } from "../../lib/types";
 import { allCards } from "../../lib/allCards";
 
 const runGame = (socket: Socket) => {
