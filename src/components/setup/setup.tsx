@@ -30,16 +30,13 @@ export default function Setup(props: {
   const isLobbyReady = numCards >= totalCards;
 
   const discussionTimeRef = useRef<HTMLInputElement>(null);
+  if (discussionTimeRef.current) {
+    discussionTimeRef.current.value = `${lobby.discussionTime}`;
+  }
 
   useEffect(() => {
     client.socket?.emit(ServerAction.SyncLobby);
   }, []);
-
-  useEffect(() => {
-    if (discussionTimeRef.current) {
-      discussionTimeRef.current.value = `${lobby.discussionTime}`;
-    }
-  }, [lobby.discussionTime]);
 
   const toggleCardEnabled = (cardId: number) => {
     if (!props.isAdmin) throw AdminError();

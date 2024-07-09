@@ -1,6 +1,6 @@
 import { customAlphabet } from "nanoid";
 import { Socket } from "socket.io";
-import { CardType } from "./types";
+import { CardType, Lobby } from "./types";
 
 const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const nanoid = customAlphabet(alphabet, 6);
@@ -36,6 +36,13 @@ export function shuffled<T>(array: T[]): T[] {
 
   return newArray;
 }
+
+export const allPlayersReady = (_lobby: Lobby): boolean => {
+  for (const player of _lobby.players) {
+    if (player.isReady == false) return false;
+  }
+  return true;
+};
 
 export function createPlayerTurns(cards: Map<string, number>): string[][] {
   const cardSet = new Map<number, string[]>();

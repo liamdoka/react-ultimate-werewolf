@@ -26,9 +26,3 @@ export const defaultGamePlayer: GamePlayer = {
   initialCard: CardType.Empty,
   endCard: CardType.Empty,
 };
-
-export const useDesktop = () => {
-  const isDesktop = useMediaQuery("(min-wdith: 768px)");
-  console.log(`isDesktop: ${isDesktop}`);
-  return isDesktop;
-};

@@ -8,9 +8,8 @@ import { useEffect, useState } from "react";
 import {
   CARD_ROTATION_DURATION,
   CARD_ROTATION_FACTOR,
-  useDesktop,
 } from "../../lib/constants";
-import { useTimeout } from "../../lib/hooks";
+import { useMobile, useTimeout } from "../../lib/hooks";
 import PlayerCard from "./cards/playerCard";
 import GameCard from "./cards/gameCard";
 
@@ -18,7 +17,7 @@ export default function Dealer() {
   const [tempCardVisible, setTempCardVisible] = useState<boolean>(false);
   const [playerCardVisible, setPlayerCardVisible] = useState<boolean>(false);
   const controls = useAnimation();
-  const isDesktop = useDesktop();
+  const isMobile = useMobile();
 
   const lobby = useLobby();
   const client = useClient();
@@ -26,7 +25,7 @@ export default function Dealer() {
   const gameDispatch = useGameDispatch();
 
   const deckSize = lobby.deck.length;
-  const radius = isDesktop ? 25 * (deckSize ?? 5) : 15 * (deckSize ?? 5);
+  const radius = isMobile ? 15 * (deckSize ?? 5) : 25 * (deckSize ?? 5);
 
   useEffect(() => {
     const sequence = async () => {

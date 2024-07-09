@@ -10,15 +10,16 @@ import {
   useLobbyDispatch,
 } from "../context/lobbyContext";
 import { useClient } from "../context/clientContext";
-import { COUNTDOWN_TIME, useDesktop } from "../lib/constants";
-import { useInterval } from "../lib/utils";
+import { COUNTDOWN_TIME } from "../lib/constants";
+import { useInterval, useMobile } from "../lib/hooks";
+import { allPlayersReady } from "../lib/utils";
 
 export default function SetupPage() {
   const [timeToStart, setTimeToStart] = useState<number>(COUNTDOWN_TIME);
   const [isStarting, setIsStarting] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
-  const isDesktop = useDesktop();
+  const isMobile = useMobile();
 
   const lobby = useLobby();
   const lobbyDispatch = useLobbyDispatch();
@@ -77,13 +78,6 @@ export default function SetupPage() {
     isStarting ? 1000 : null,
   );
 
-  const allPlayersReady = (_lobby: Lobby): boolean => {
-    for (const player of _lobby.players) {
-      if (player.isReady == false) return false;
-    }
-    return true;
-  };
-
   const checkStartGame = (_lobby: Lobby) => {
     const arePlayersReady = allPlayersReady(_lobby);
 
@@ -129,7 +123,13 @@ export default function SetupPage() {
     <>
       {lobby && (
         <div className="flex flex-col items-center gap-4 p-4 md:flex-row">
-          {isDesktop ? (
+          {isMobile ? (
+            <>
+              <RoomCode code={client.roomCode} />
+              <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
+              <LobbyMenu />
+            </>
+          ) : (
             <>
               <div className="flex flex-col items-center gap-4">
                 <RoomCode code={client.roomCode} />
@@ -138,12 +138,6 @@ export default function SetupPage() {
 
               <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
               <Chatbox />
-            </>
-          ) : (
-            <>
-              <RoomCode code={client.roomCode} />
-              <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
-              <LobbyMenu />
             </>
           )}
         </div>

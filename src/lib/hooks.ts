@@ -56,3 +56,9 @@ export const useMediaQuery = (query: string) => {
 
   return matches;
 };
+
+export const useMobile = () => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  console.log(`isMobile: ${isMobile}`);
+  return isMobile;
+};
