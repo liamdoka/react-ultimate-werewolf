@@ -3,7 +3,13 @@ import RoomCode from "../components/roomCode/roomCode";
 import LobbyMenu from "../components/lobby/lobby";
 import Setup from "../components/setup/setup";
 import { useEffect, useState } from "react";
-import { LobbyState, Lobby, LobbyAction, ServerAction } from "../lib/types";
+import {
+  LobbyState,
+  Lobby,
+  LobbyAction,
+  ServerAction,
+  Player,
+} from "../lib/types";
 import {
   LobbyPayload,
   useLobby,
@@ -25,7 +31,10 @@ export default function SetupPage() {
   const lobbyDispatch = useLobbyDispatch();
 
   const client = useClient();
-
+  const isReady: boolean =
+    lobby.players.find(
+      (player: Player) => player.socketId === client.socket?.id,
+    )?.isReady ?? false;
   // update lobby on server action
   useEffect(() => {
     client.socket?.on(ServerAction.SyncLobby, handleSyncLobby);
@@ -53,14 +62,14 @@ export default function SetupPage() {
   // set the admin every time the lobby changes
   useEffect(() => {
     setIsAdmin(client.socket?.id == lobby?.admin);
-  }, [lobby, client]);
+  }, [lobby.admin, client.socket]);
 
   // start countdown timer on LobbyState change
   useEffect(() => {
-    if (isStarting === false && lobby.state === LobbyState.Starting) {
-      setIsStarting(true);
+    if (lobby.state === LobbyState.Starting) {
+      if (isStarting == false) setIsStarting(true);
     } else {
-      setIsStarting(false);
+      if (isStarting == true) setIsStarting(false);
       setTimeToStart(COUNTDOWN_TIME);
     }
   }, [lobby, isStarting]);
@@ -91,6 +100,14 @@ export default function SetupPage() {
           ..._lobby,
           state: LobbyState.Waiting,
         };
+        const adminIndex = newLobby.players.findIndex(
+          (player: Player) => player.socketId === lobby.admin,
+        );
+        if (adminIndex < 0 || adminIndex > newLobby.players.length)
+          throw RangeError();
+
+        newLobby.players[adminIndex].isReady = false;
+
         client.socket?.emit(ServerAction.UpdateLobby, newLobby);
       }
     }
@@ -126,7 +143,11 @@ export default function SetupPage() {
           {isMobile ? (
             <>
               <RoomCode code={client.roomCode} />
-              <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
+              <Setup
+                timeToStart={timeToStart}
+                isAdmin={isAdmin}
+                isReady={isReady}
+              />
               <LobbyMenu />
             </>
           ) : (
@@ -136,7 +157,11 @@ export default function SetupPage() {
                 <LobbyMenu />
               </div>
 
-              <Setup timeToStart={timeToStart} isAdmin={isAdmin} />
+              <Setup
+                timeToStart={timeToStart}
+                isAdmin={isAdmin}
+                isReady={isReady}
+              />
               <Chatbox />
             </>
           )}

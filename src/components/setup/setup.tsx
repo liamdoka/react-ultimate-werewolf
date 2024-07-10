@@ -1,7 +1,7 @@
 import { Lobby, Player, ServerAction } from "../../lib/types";
 import SetupCard from "./setupCard";
 import { defaultDeck } from "../../lib/allCards";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Add, Remove } from "@mui/icons-material";
 import {
   COUNTDOWN_TIME,
@@ -18,9 +18,8 @@ import { AdminError } from "../../lib/errors";
 export default function Setup(props: {
   timeToStart: number;
   isAdmin: boolean;
+  isReady: boolean;
 }) {
-  const [isReady, setIsReady] = useState<boolean>(false);
-
   const lobby = useLobby();
   const client = useClient();
 
@@ -73,8 +72,8 @@ export default function Setup(props: {
       (player: Player) => player.socketId === client.socket?.id,
     );
 
-    newLobby.players[playerIndex].isReady = !isReady;
-    setIsReady(!isReady);
+    const newState = !newLobby.players[playerIndex].isReady;
+    newLobby.players[playerIndex].isReady = newState;
     client.socket?.emit(ServerAction.UpdateLobby, newLobby);
   };
 
@@ -153,8 +152,8 @@ export default function Setup(props: {
         </div>
         {isLobbyReady ? (
           <div
-            className={`flex basis-full cursor-pointer items-center justify-center rounded-md ${isReady ? "bg-emerald-800" : "bg-slate-800"} p-2 text-center font-bold`}
-            onClick={toggleReady}
+            className={`flex basis-full cursor-pointer items-center justify-center rounded-md ${props.isReady ? "bg-emerald-800" : "bg-slate-800"} p-2 text-center font-bold`}
+            onMouseDown={toggleReady}
           >
             {props.timeToStart === COUNTDOWN_TIME ? "Ready" : props.timeToStart}
           </div>
